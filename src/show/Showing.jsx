@@ -3,6 +3,7 @@ import Icon from '../components/Icon.jsx';
 import Annotated from './Annotated.jsx';
 import FlowDemo from './FlowDemo.jsx';
 import VideoSlot from './VideoSlot.jsx';
+import { AiTag, PhotoSplit, SkinChange } from './Photo.jsx';
 import LiveScreen from './LiveScreen.jsx';
 import SyncDemo from './SyncDemo.jsx';
 import ZoomView from './ZoomView.jsx';
@@ -340,7 +341,24 @@ function Sub({ label, children }) {
 }
 
 /** Full-bleed scene cover inside Key Features. */
-function Cover({ id, n, en, title, ko, tone, art }) {
+function Cover({ id, n, en, title, ko, tone, art, photo, photoAlt }) {
+  if (photo) {
+    return (
+      <div className={`x-pcover x-pcover--${tone}`} id={id}>
+        <div className="x-pcover__photo">
+          <img src={asset(photo)} alt={photoAlt} loading="lazy" decoding="async" />
+          <AiTag dark={tone !== 'night'} />
+        </div>
+        <div className="x-pcover__in">
+          <span className="x-cover__n">
+            Scene {n} — {en}
+          </span>
+          <h3 className="x-pcover__title">{title}</h3>
+          <p className="x-pcover__ko">{ko}</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={`x-cover x-cover--${tone}`} id={id}>
       <div className="x-cover__art" aria-hidden="true">
@@ -458,31 +476,22 @@ const HERO_SHOTS = [
 ];
 
 function HeroCover() {
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const t = setInterval(() => setI((x) => (x + 1) % HERO_SHOTS.length), 5200);
-    return () => clearInterval(t);
-  }, []);
   return (
-    <section className="x-kv" aria-label="Trac:ing 키 비주얼">
-      {HERO_SHOTS.map((x, k) => (
-        <div
-          key={x.img}
-          className={`x-kv__shot ${k === i ? 'is-on' : ''}`}
-          style={{ backgroundImage: `url(${asset(x.img)})`, '--x': x.x, '--y': x.y }}
-          aria-hidden="true"
-        />
-      ))}
+    <section className="x-kv x-kv--photo" aria-label="Trac:ing 키 비주얼">
+      <img className="x-kv__img" src={asset('photo/hero.jpg')} alt="아침 햇살 속 화장대에서 탁상 미러를 보는 사용자" fetchpriority="high" />
       <div className="x-kv__veil" aria-hidden="true" />
-      <h1 className="x-kv__title">
-        The Mirror That
-        <br />
-        Remembers Your Day
-      </h1>
+      <div className="x-kv__in">
+        <p className="x-kv__kicker">Trac:ing — Desk Beauty Mirror &amp; App</p>
+        <h1 className="x-kv__title">
+          The Mirror That
+          <br />
+          Remembers Your Day
+        </h1>
+        <p className="x-kv__ko">하루를 이어서 기억하는 거울</p>
+      </div>
       <p className="x-kv__foot">
-        <span>{HERO_SHOTS[i].cap}</span>
-        <span>Trac:ing — Desk Beauty Mirror &amp; App · 2026</span>
+        <span>Interaction Design 2026 · 22565053 조윤정 · 김승언 교수님</span>
+        <AiTag />
       </p>
     </section>
   );
@@ -591,6 +600,15 @@ export default function Showing() {
         </Reveal>
       </Chapter>
 
+      <PhotoSplit
+        src="photo/product.jpg"
+        alt="탁상형 뷰티 미러 제품 이미지"
+        ratio="4 / 3"
+        label="Product"
+        title="책상 위에 두는, 1m 거리의 거울"
+        body="화장대나 책상 위에 올려 두는 탁상형 디스플레이 미러입니다. 거울 앞 약 1m에서 읽히는 화면, 손이 바쁠 때를 위한 음성 안내, 폰 앱과의 연동을 기본으로 설계했습니다."
+        keys={['#탁상형', '#디스플레이 1440×817', '#음성 안내', '#앱 연동']}
+      />
       <ProductShot />
 
       <Sub label="Screen Anatomy · HOME">아침 08:10의 홈 화면입니다. 번호를 누르거나 목록 위에 올리면 해당 영역이 강조됩니다.</Sub>
@@ -791,7 +809,7 @@ export default function Showing() {
       {/* 07 KEY FEATURES (UI) -------------------------------------- */}
       <Chapter id="features" title="네 장면으로 보는 하루" lead="각 장면은 사용 전 → 조작 → 화면 변화 → 결과 순서로 구성했습니다. 화면 위 파란 테두리(TAP)를 누르면 실제 버튼처럼 다음 화면으로 넘어갑니다." />
 
-      <Cover id="morning" n="1" en="Morning" tone="morning" title="Fit Time & Follow" ko="출근 시간에 맞춰, 거울이 먼저 켜진다" art={<span className="x-sun" />} />
+      <Cover id="morning" n="1" en="Morning" tone="morning" title="Fit Time & Follow" ko="출근 시간에 맞춰, 거울이 먼저 켜진다" photo="photo/morning.jpg" photoAlt="거울을 보며 광대 위쪽에 블러셔를 두드리는 사용자" />
       <Sub label="08:10 · 시계를 보지 않아도 되는 아침">거울이 시간과 순서를 챙기고, 사용자는 따라 하기만 합니다. 어디를 몇 번 보정했는지도 함께 기록됩니다.</Sub>
       <section className="x-band x-band--morning">
         <FlowDemo steps={MORNING_STEPS} label="아침 메이크업 흐름" variant="cinema" />
@@ -822,6 +840,8 @@ export default function Showing() {
         n="3"
         en="Night"
         tone="night"
+        photo="photo/night.jpg"
+        photoAlt="세안 후 탁상 미러 앞에서 피부 스캔을 받는 사용자"
         title="Check & Care"
         ko="부위별로 재고, 겹친 원으로 읽는다"
         art={
@@ -893,6 +913,10 @@ export default function Showing() {
           </span>
         }
       />
+      <Sub label="Skin Change · 14일, 볼 수분 32 → 58">같은 부위를 같은 거리와 조명에서 매일 기록하기 때문에, 변화를 사진과 수치로 나란히 비교할 수 있습니다. 사진이나 슬라이더로 기간을 바꿔 보세요.</Sub>
+      <section className="x-band x-band--plain">
+        <SkinChange />
+      </section>
       <Sub label="Review · 쌓이면 보이는 변화">기록이 쌓이면 피부가 실제로 어떻게 바뀌었는지 숫자로 보입니다. 영역을 눌러 확대해 보세요.</Sub>
       <section className="x-band x-band--tomorrow">
         <ZoomView src="change.png" alt="변화 화면 · 피부 지수 7주 추이와 피부 나이" regions={CHANGE_REGIONS} />
@@ -904,6 +928,15 @@ export default function Showing() {
 
       {/* 08 MIRROR × MOBILE ---------------------------------------- */}
       <Chapter id="sync" title="거울은 안내하고, 폰은 이어 받는다" lead="화장품을 든 손으로는 거울을 만지기 어렵습니다. 거울은 얼굴 앞에서 안내와 측정을, 폰은 루틴 선택·리모컨·기록 수신을 맡습니다. 오른쪽 폰 화면을 직접 눌러 보세요.">
+        <PhotoSplit
+          src="photo/phone.jpg"
+          alt="화장대 앞에서 폰으로 거울을 조작하는 손"
+          flip
+          label="Use Scene"
+          title="손은 화장품을, 폰은 리모컨을"
+          body="거울 화면을 직접 만지지 않아도 됩니다. 폰에서 루틴을 골라 거울로 보내고, 진행 중에는 ‘다음’과 ‘+1분’을 폰으로 누릅니다. 끝나면 기록이 폰에 남습니다."
+          keys={['#루틴 보내기', '#리모컨', '#기록 수신']}
+        />
         <div className="x-sync">
           <SyncDemo />
           <VideoSlot

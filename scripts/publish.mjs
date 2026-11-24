@@ -115,7 +115,7 @@ async function main() {
 
   const pages = await api('GET', '/pages', null, [404]);
   if (pages.status === 404) {
-    await api('POST', '/pages', { source: { branch: 'gh-pages', path: '/' } });
+    await api('POST', '/pages', { source: { branch: 'gh-pages', path: '/' } }, [409]);
     console.log('\n✓ GitHub Pages enabled (gh-pages / root)');
   }
   const [owner, name] = REPO.split('/');

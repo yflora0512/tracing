@@ -447,33 +447,42 @@ const HERO_MODES = [
   { key: 'night', time: '21:40', en: 'Night', ko: '퇴근 후 · 피부 스캔', img: 'scan-ready.png', alt: '저녁 21:40 스캔 준비 화면 · 볼이 3일째 건조해요' },
 ];
 
+/**
+ * Cover = key film (UNIX “video-wrap”): the real mirror screens in slow macro close-ups, one line of copy.
+ * Until the concept film (Video 01) exists, these crops stand in for it.
+ */
+const HERO_SHOTS = [
+  { img: 'home.png', x: '78%', y: '30%', cap: '08:10 — 볼이 계속 건조해요' },
+  { img: 'makeup.png', x: '22%', y: '26%', cap: '08:24 — 광대 위쪽에 가볍게 두드려요' },
+  { img: 'scan-result.png', x: '30%', y: '52%', cap: '21:52 — 겹친 원으로 읽는 오늘의 피부' },
+];
+
 function HeroCover() {
-  const [m, setM] = useState(0);
-  const mode = HERO_MODES[m];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const t = setInterval(() => setI((x) => (x + 1) % HERO_SHOTS.length), 5200);
+    return () => clearInterval(t);
+  }, []);
   return (
-    <section className={`x-hero is-${mode.key}`}>
-      <div className="x-hero__sky" aria-hidden="true" />
-      <div className="x-hero__sky x-hero__sky--night" aria-hidden="true" />
-      <TraceFace spots={false} className="trace--hero" />
-      <div className="x-hero__in">
-        <p className="x-hero__kicker">Trac:ing — Desk Beauty Mirror &amp; App</p>
-        <h1 className="x-hero__title">
-          The Mirror That
-          <br />
-          Remembers Your Day
-        </h1>
-        <p className="x-hero__ko">하루를 이어서 기억하는 거울</p>
-        <div className="x-hero__modes" role="tablist" aria-label="아침 / 저녁">
-          {HERO_MODES.map((x, k) => (
-            <button key={x.key} type="button" role="tab" aria-selected={k === m} className={k === m ? 'is-on' : ''} onClick={() => setM(k)}>
-              <b>{x.time}</b> {x.en}
-            </button>
-          ))}
-        </div>
-      </div>
-      <p className="x-hero__foot">
-        <span>We trace your morning, care for your night, and carry it into tomorrow.</span>
-        <span>Interaction Design 2026 · 22565053 조윤정 · 김승언 교수님</span>
+    <section className="x-kv" aria-label="Trac:ing 키 비주얼">
+      {HERO_SHOTS.map((x, k) => (
+        <div
+          key={x.img}
+          className={`x-kv__shot ${k === i ? 'is-on' : ''}`}
+          style={{ backgroundImage: `url(${asset(x.img)})`, '--x': x.x, '--y': x.y }}
+          aria-hidden="true"
+        />
+      ))}
+      <div className="x-kv__veil" aria-hidden="true" />
+      <h1 className="x-kv__title">
+        The Mirror That
+        <br />
+        Remembers Your Day
+      </h1>
+      <p className="x-kv__foot">
+        <span>{HERO_SHOTS[i].cap}</span>
+        <span>Trac:ing — Desk Beauty Mirror &amp; App · 2026</span>
       </p>
     </section>
   );

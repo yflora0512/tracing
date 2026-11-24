@@ -62,9 +62,16 @@ export default function FlowDemo({ steps, ratio = '2390 / 1356', label, variant 
             </li>
           ))}
         </ol>
-        <p className="flow__desc" aria-live="polite">
-          {s.desc}
-        </p>
+        <div className="flow__info" aria-live="polite">
+          {s.keys && (
+            <ul className="flow__keys">
+              {s.keys.map((k) => (
+                <li key={k}>{k}</li>
+              ))}
+            </ul>
+          )}
+          <p className="flow__desc">{s.desc}</p>
+        </div>
         <div className="flow__ctrl">
           <button type="button" className="btn-ghost" onClick={() => go(i - 1)} disabled={i === 0}>
             이전

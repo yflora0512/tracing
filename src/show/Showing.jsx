@@ -1,10 +1,12 @@
 import { useEffect, useId, useState } from 'react';
 import Icon from '../components/Icon.jsx';
+import Annotated from './Annotated.jsx';
 import FlowDemo from './FlowDemo.jsx';
+import VideoSlot from './VideoSlot.jsx';
 import LiveScreen from './LiveScreen.jsx';
 import SyncDemo from './SyncDemo.jsx';
 import ZoomView from './ZoomView.jsx';
-import { MirrorShot, Placeholder, Reveal, asset } from './parts.jsx';
+import { MirrorShot, Reveal, asset } from './parts.jsx';
 import './show.css';
 import './x.css';
 
@@ -86,10 +88,39 @@ const LOOP = [
   { n: '06', en: 'Review', ko: '변화 확인', t: 'next' },
 ];
 
+/* screen anatomy pins — positions measured on the exported final frames (percent of image) */
+const HOME_PINS = [
+  { l: 79, t: 3, w: 10.5, h: 9, k: 'Status', title: '날짜 · 날씨 · 시각', d: '11월 5일(목) 12°C · 08:10. 시계를 따로 보지 않도록 거울 오른쪽 위에 고정합니다.' },
+  { l: 63, t: 13.8, w: 26.5, h: 6.6, k: 'Alert', title: '한 줄 알림', d: '“3일째 볼 수분이 줄고 있어요.” 어제까지의 기록에서 이어진 변화를 한 줄로 먼저 알려 줍니다.' },
+  { l: 63, t: 22.2, w: 26.5, h: 28, k: 'Focus', title: '오늘의 포커스', d: '“볼이 계속 건조해요”와 7일 수분 그래프(오늘 42). 오늘 가장 신경 쓸 한 가지만 크게 보여 줍니다.' },
+  { l: 15, t: 35, w: 32, h: 22, k: 'Mirror Map', title: '얼굴 위 부위 라벨', d: '거울에 비친 얼굴 옆에 볼 · 건조(3일 연속), T존 · 보통, 트러블 · 없음을 표시합니다. 부위를 누르면 상세로 이동합니다.' },
+  { l: 63, t: 52.5, w: 26.5, h: 43, k: 'Metric', title: '관심 지표', d: '수분 · 유분 · 트러블 탭. “낮음 ▼ 3일 연속”, 오늘 수분 32 / 주간 평균 57을 막대로 비교합니다.' },
+  { l: 91, t: 14, w: 6.6, h: 82, k: 'Navigation', title: '세로 메뉴 레일', d: '홈 · 메이크업 · 관리 · 변화 · 루틴과 설정. 오른쪽 끝에 세로로 고정해 얼굴을 가리지 않습니다.' },
+];
+
+const MAKEUP_PINS = [
+  { l: 17.2, t: 20.8, w: 32.5, h: 6.6, k: 'Action', title: '지금 할 행동 한 줄', d: '“광대 위쪽에 가볍게 두드려요.” 얼굴 위에는 이 한 줄만 두고, 강조어(가볍게)만 파란색으로 표시합니다.' },
+  { l: 17.2, t: 27.6, w: 32.5, h: 3.8, k: 'Progress', title: '단계 진행 · 남은 시간', d: '블러셔 3/4 · 4분 남음. 출근 시각 기준 타이머로, 단계별 남은 시간을 바 하나로 보여 줍니다.' },
+  { l: 63, t: 14, w: 26.5, h: 14.5, k: 'Product', title: '지금 쓸 제품', d: '에스쁘아 블러 웨어 블러셔 · 크림 · 촉촉한 마무리 · 건조 피부 OK. 피부 기록과 맞는지까지 함께 알려 줍니다.' },
+  { l: 63, t: 30.5, w: 26.5, h: 57, k: 'Guide Video', title: '가이드 영상 패널', d: '단계별 시범 영상은 얼굴 밖 패널에서 재생합니다. (영상 자리 — 아래 Video 02 참고)' },
+  { l: 55.4, t: 85.2, w: 4.4, h: 7.8, k: 'Voice', title: '음성 안내 · 명령', d: '화장 종료 5분·10분 전 음성으로 알리고, 손이 바쁠 때는 음성으로 다음 단계로 넘깁니다.' },
+  { l: 63, t: 89, w: 26.5, h: 6.8, k: 'Control', title: '이전 / 다음', d: '단계 이동 버튼. 같은 조작을 폰 리모컨(08 Mirror × Mobile)에서도 할 수 있습니다.' },
+];
+
+const SCAN_PINS = [
+  { l: 22, t: 36, w: 22, h: 31, k: 'Layered Circles', title: '겹친 원 · 부위별 상태', d: '볼 · 건조 3단계(양쪽 볼 · 넓음), T존 · 보통, 턱 · 양호. 원이 클수록 범위가 넓고, 많이 겹칠수록 오래 진행된 상태입니다.' },
+  { l: 4.5, t: 88, w: 18, h: 5.4, k: 'Legend', title: '화면 안 범례', d: '“원 크기 = 범위 · 겹칠수록 진행”을 화면 안에 항상 표시해 설명 없이 읽을 수 있게 했습니다.' },
+  { l: 63, t: 14, w: 26.5, h: 22.5, k: 'Summary', title: '오늘 피부 요약', d: '21:52 스캔 · 종합 72 ▲4. “볼이 건조해요”와 수분 42(어제보다 ▼8) · 유분 58 · 피부결 71.' },
+  { l: 63, t: 39.6, w: 26.5, h: 11, k: 'Connect', title: '아침 기록과 연결', d: '“세미 매트 쿠션 13시간 유지.” 아침 기록을 건조의 원인 후보로 연결해 보여 줍니다.' },
+  { l: 63, t: 52.2, w: 26.5, h: 36, k: 'Care', title: '추천 관리 순서', d: '화장품 / 디바이스 함께 중 선택. 클렌징 → 토너 → 수분 앰플 → 수분 크림, 4단계 6분.' },
+  { l: 63, t: 89, w: 26.5, h: 6.8, k: 'Action', title: '기록만 저장 / 관리 시작', d: '바로 관리를 시작하거나, 기록만 남기고 다음 날 변화 확인으로 넘길 수 있습니다.' },
+];
+
 const MORNING_STEPS = [
   {
     phase: '사용 전',
     title: '거울이 먼저 켜진다',
+    keys: ['#어제 기록', '#오늘의 포커스'],
     img: 'home.png',
     desc: '08:10, 거울 앞에 서면 어제 저녁 기록으로 “볼이 계속 건조해요”를 먼저 알려 줍니다. 오른쪽 메뉴의 메이크업 탭을 눌러 보세요.',
     hotspot: { l: 91.6, t: 24.2, w: 5.8, h: 7.6, label: '메이크업 탭', tip: 'left' },
@@ -97,6 +128,7 @@ const MORNING_STEPS = [
   {
     phase: '조작 → 화면 변화',
     title: '지금 할 행동 한 줄',
+    keys: ['#행동 한 줄','#진행 바','#얼굴 밖 패널'],
     img: 'makeup.png',
     desc: '얼굴 위에는 “광대 위쪽에 가볍게 두드려요” 한 줄과 진행 바만 둡니다. 제품과 가이드 영상은 얼굴 밖 패널로 옮겼습니다.',
     hotspot: { l: 72.3, t: 89.2, w: 17.1, h: 6.4, label: '다음 단계', tip: 'top' },
@@ -104,6 +136,7 @@ const MORNING_STEPS = [
   {
     phase: '사용 결과',
     title: '보정 부위까지 기록',
+    keys: ['#결과 체크','#보정 부위','#자동 기록'],
     live: { path: '/mirror/makeup/done', w: 1440, h: 817 },
     desc: '18분 / 예상 20분. 블러셔 오른쪽 1곳은 “1cm 아래로” 보정을 권합니다. ‘거울 / 결과 체크’를 직접 눌러 보세요.',
   },
@@ -113,6 +146,7 @@ const NIGHT_STEPS = [
   {
     phase: '사용 전',
     title: '오늘 볼 것부터',
+    keys: ['#아침 기록 연결','#스캔 준비'],
     img: 'scan-ready.png',
     desc: '21:40, 아침 기록을 이어 받아 “볼이 3일째 건조해요”를 먼저 보여 줍니다. 얼굴을 틀에 맞추면 스캔을 준비합니다.',
     hotspot: { l: 63.1, t: 88.2, w: 26.3, h: 7.4, label: '스캔 시작', tip: 'top' },
@@ -120,6 +154,7 @@ const NIGHT_STEPS = [
   {
     phase: '화면 변화',
     title: '부위별 순서 측정',
+    keys: ['#부위별 측정','#자동 진행'],
     img: 'scan-progress.png',
     auto: 3200,
     desc: '볼 → T존 → 턱 → 얼굴 전체 순서로 측정합니다. 끝나면 자동으로 결과로 넘어갑니다.',
@@ -127,6 +162,7 @@ const NIGHT_STEPS = [
   {
     phase: '결과 읽기',
     title: '겹친 원으로 읽기',
+    keys: ['#겹친 원','#범위 · 진행'],
     img: 'scan-result.png',
     desc: '원이 클수록 범위가 넓고, 많이 겹칠수록 오래 진행된 상태입니다. 볼 영역을 눌러 보세요.',
     hotspot: { l: 16, t: 46.5, w: 13.5, h: 12, label: '볼 영역', tip: 'top' },
@@ -134,6 +170,7 @@ const NIGHT_STEPS = [
   {
     phase: '사용 결과',
     title: '오늘의 관리 코스',
+    keys: ['#목표 수치','#6분 관리 코스'],
     img: 'scan-detail.png',
     desc: '오늘 목표는 수분 60(지금 42). 수분 앰플(볼에 2방울)부터 6분 관리 코스로 바로 이어집니다.',
   },
@@ -143,6 +180,7 @@ const ROUTINE_STEPS = [
   {
     phase: '사용 전',
     title: 'AI가 제안한다',
+    keys: ['#AI 제안','#변경값 미리 보기'],
     img: 'routine.png',
     desc: '쌓인 기록으로 “기초에 수분 앰플 1분을 더할까요?”를 제안하고, 바뀌는 값(시작 07:50→07:49)을 미리 보여 줍니다.',
     hotspot: { l: 64.9, t: 72.8, w: 11, h: 5.4, label: '추가', tip: 'top' },
@@ -150,6 +188,7 @@ const ROUTINE_STEPS = [
   {
     phase: '조작 → 화면 변화',
     title: '내일 루틴에 반영',
+    keys: ['#루틴 반영','#자동 조정'],
     img: 'routine.png',
     overlay: (
       <div className="applied" style={{ left: '64.6%', top: '54%', width: '23.2%' }}>
@@ -163,6 +202,7 @@ const ROUTINE_STEPS = [
   {
     phase: '사용 결과',
     title: '다음 날 첫 화면',
+    keys: ['#하루의 순환'],
     img: 'home.png',
     desc: '오늘의 결과가 다음 날 첫 화면이 됩니다. 하루가 다시 처음으로 이어집니다.',
   },
@@ -345,20 +385,6 @@ function TraceFace({ spots = true, className = '' }) {
   );
 }
 
-function DeskMirror({ src, alt }) {
-  return (
-    <div className="desk">
-      <div className="desk__mirror">
-        <div className="desk__screen">
-          <img src={asset(src)} alt={alt} loading="lazy" decoding="async" />
-        </div>
-      </div>
-      <span className="desk__neck" aria-hidden="true" />
-      <span className="desk__base" aria-hidden="true" />
-    </div>
-  );
-}
-
 function ConnectDemo() {
   const [sel, setSel] = useState('skin');
   const t = CONNECT_TILES.find((x) => x.key === sel);
@@ -415,6 +441,91 @@ function ConnectDemo() {
   );
 }
 
+/** Cover: wordmark + the product itself. The mirror switches Morning ↔ Night (auto, or by tapping), and the whole cover follows. */
+const HERO_MODES = [
+  { key: 'day', time: '08:10', en: 'Morning', ko: '출근 전 · 메이크업 안내', img: 'home.png', alt: '아침 08:10 홈 화면 · 볼이 계속 건조해요' },
+  { key: 'night', time: '21:40', en: 'Night', ko: '퇴근 후 · 피부 스캔', img: 'scan-ready.png', alt: '저녁 21:40 스캔 준비 화면 · 볼이 3일째 건조해요' },
+];
+
+function HeroCover() {
+  const [m, setM] = useState(0);
+  const [auto, setAuto] = useState(true);
+  useEffect(() => {
+    if (!auto || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const t = setInterval(() => setM((x) => 1 - x), 4200);
+    return () => clearInterval(t);
+  }, [auto]);
+  useEffect(() => {
+    document.documentElement.dataset.hero = HERO_MODES[m].key;
+    return () => delete document.documentElement.dataset.hero;
+  }, [m]);
+  const mode = HERO_MODES[m];
+  return (
+    <section className={`x-cov is-${mode.key}`}>
+      <div className="x-cov__text">
+        <p className="x-cov__kicker">Desk Beauty Mirror &amp; App — Interaction Design 2026</p>
+        <h1 className="x-cov__mark">
+          Trac<span>:</span>ing
+        </h1>
+        <p className="x-cov__tag">하루를 이어서 기억하는 거울</p>
+        <p className="x-cov__en">The mirror that remembers your day.</p>
+        <div className="x-cov__modes" role="tablist" aria-label="아침 / 저녁 화면 전환">
+          {HERO_MODES.map((x, k) => (
+            <button
+              key={x.key}
+              type="button"
+              role="tab"
+              aria-selected={k === m}
+              className={`x-cov__mode ${k === m ? 'is-on' : ''}`}
+              onClick={() => {
+                setAuto(false);
+                setM(k);
+              }}
+            >
+              <b>{x.time}</b>
+              <span>
+                {x.en} · {x.ko}
+              </span>
+              {k === m && auto && <i className="x-cov__timer" aria-hidden="true" />}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="x-cov__visual">
+        <div className="desk">
+          <div className="desk__mirror">
+            <div className="desk__screen">
+              {HERO_MODES.map((x, k) => (
+                <img key={x.key} src={asset(x.img)} alt={k === m ? x.alt : ''} className={k === m ? 'is-on' : ''} decoding="async" />
+              ))}
+            </div>
+          </div>
+          <span className="desk__neck" aria-hidden="true" />
+          <span className="desk__base" aria-hidden="true" />
+        </div>
+      </div>
+      <dl className="x-cov__meta">
+        <div>
+          <dt>Designer</dt>
+          <dd>22565053 조윤정</dd>
+        </div>
+        <div>
+          <dt>Professor</dt>
+          <dd>김승언 교수님</dd>
+        </div>
+        <div>
+          <dt>Scope</dt>
+          <dd>BX · UX · UI · Prototype</dd>
+        </div>
+        <div>
+          <dt>Date</dt>
+          <dd>2026.11.17</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
 /* ---------------- page ---------------- */
 
 export default function Showing() {
@@ -430,23 +541,8 @@ export default function Showing() {
     <div className="show x" id="top">
       <Header />
 
-      {/* KEY VISUAL ------------------------------------------------ */}
-      <section className="x-hero">
-        <div className="x-hero__sky" aria-hidden="true" />
-        <TraceFace spots={false} className="trace--hero" />
-        <div className="x-hero__in">
-          <h1 className="x-hero__title">
-            The Mirror That
-            <br />
-            Remembers Your Day
-          </h1>
-          <p className="x-hero__ko">하루를 이어서 기억하는 거울, Trac:ing</p>
-        </div>
-        <p className="x-hero__foot">
-          <span>Trac:ing — Desk Beauty Mirror &amp; App</span>
-          <span>Interaction Design 2026 · 22565053 조윤정 · 김승언 교수님</span>
-        </p>
-      </section>
+      {/* COVER -------------------------------------------------- */}
+      <HeroCover />
 
       {/* INDEX ------------------------------------------------------- */}
       <section className="x-index" id="index">
@@ -483,14 +579,20 @@ export default function Showing() {
         </Reveal>
       </Chapter>
 
-      <section className="x-product">
-        <Reveal className="x-product__in">
-          <DeskMirror src="home.png" alt="Trac:ing 미러 홈 화면 · 08:10 볼이 계속 건조해요" />
-        </Reveal>
-        <p className="x-product__cap">
-          <b>08:10</b> 거울 앞에 서면, 어제의 기록이 오늘의 피부를 먼저 알려 줍니다.
-        </p>
+      <Sub label="Screen Anatomy · HOME">아침 08:10의 홈 화면입니다. 번호를 누르거나 목록 위에 올리면 해당 영역이 강조됩니다.</Sub>
+      <section className="x-band x-band--plain">
+        <Annotated src="home.png" alt="미러 홈 화면" label="홈 화면 구성" pins={HOME_PINS} />
       </section>
+      <Sub label="Concept Film">서비스 전체를 30초 안에 보여 주는 영상이 들어갈 자리입니다.</Sub>
+      <div className="x-wrap">
+        <VideoSlot
+          no="01"
+          title="Concept Film — 하루를 이어서 기억하는 거울"
+          len="30초"
+          purpose="쇼잉 도입부에서 ‘아침 기록 → 저녁 관리 → 다음 날 루틴’의 순환을 한 번에 보여 줍니다."
+          shots={['08:10 거울 앞에 서면 홈 화면이 켜짐', '행동 한 줄을 따라 메이크업, 5분 전 음성 알림', '21:40 세안 후 스캔, 겹친 원 결과', '다음 날 아침 바뀐 루틴(07:49 시작)으로 시작']}
+        />
+      </div>
 
       {/* 02 PROBLEM -------------------------------------------------- */}
       <Chapter id="problem" title="시간이 없는 아침, 기억나지 않는 저녁" lead="화장은 화장대로, 관리는 관리대로 따로 놉니다. 그래서 하루에 세 번, 같은 질문이 생깁니다.">
@@ -677,20 +779,20 @@ export default function Showing() {
       <section className="x-band x-band--morning">
         <FlowDemo steps={MORNING_STEPS} label="아침 메이크업 흐름" variant="cinema" />
       </section>
-      <ul className="x-details">
-        <Reveal as="li">
-          <b>Timer</b>
-          <p>출근 시각을 기준으로 단계별 남은 시간을 보여 줍니다.</p>
-        </Reveal>
-        <Reveal as="li" delay={80}>
-          <b>Voice</b>
-          <p>화장 종료 5분·10분 전 음성으로 알리고, 음성 명령도 받습니다.</p>
-        </Reveal>
-        <Reveal as="li" delay={160}>
-          <b>Dotted Guide</b>
-          <p>점선과 원형 스팟으로 바를 위치와 양을 얼굴 위에 안내합니다.</p>
-        </Reveal>
-      </ul>
+      <Sub label="Screen Anatomy · Make Up">메이크업 진행 화면은 핵심 정보 3가지(행동 · 위치 · 제품)만 얼굴 가까이에 둡니다.</Sub>
+      <section className="x-band x-band--plain">
+        <Annotated src="makeup.png" alt="메이크업 진행 화면" label="메이크업 화면 구성" pins={MAKEUP_PINS} />
+      </section>
+      <div className="x-wrap x-wrap--gap">
+        <VideoSlot
+          no="02"
+          title="Morning — 시간에 맞춘 메이크업 안내"
+          len="15초"
+          purpose="실제 사용자가 거울의 안내를 따라 화장하는 장면으로 Fit Time · Follow를 보여 줍니다."
+          note="UI 안의 ‘가이드 영상’ 패널에 들어갈 단계별 시범 클립(세로형 약 4:5)도 함께 필요합니다."
+          shots={['출근 준비 중 거울 앞에 앉음 · 08:10 홈 화면', '“광대 위쪽에 가볍게 두드려요” 한 줄을 보며 블러셔', '“화장 종료 5분 전이에요” 음성 알림', '결과 체크 화면 · 보정 부위 1곳 표시']}
+        />
+      </div>
 
       <Cover id="connect" n="2" en="Connect" tone="connect" title="Morning to Night" ko="아침의 기록이 저녁으로 넘어간다" art={<span className="x-arc" />} />
       <Sub label="13시간 뒤 · 기록이 출발점이 되는 저녁">아침에 쓴 제품, 보정한 부위, 쿠션 유지 시간이 저녁 피부 확인의 출발점이 됩니다. 기록을 눌러 저녁 화면에 어떻게 반영되는지 확인해 보세요.</Sub>
@@ -740,10 +842,24 @@ export default function Showing() {
               <i className="blue" />
             </span>
             <b>Color = Concern</b>
-            <span>파랑은 수분, 주황은 유분</span>
+            <span>고민 종류마다 다른 색 (화면 기준)</span>
           </li>
         </ul>
       </section>
+
+      <Sub label="Screen Anatomy · Scan Result">결과 화면은 왼쪽에 겹친 원(얼굴 위), 오른쪽에 수치와 관리 순서(얼굴 밖)로 나눴습니다.</Sub>
+      <section className="x-band x-band--plain">
+        <Annotated src="scan-result.png" alt="피부 스캔 결과 화면" label="스캔 결과 화면 구성" pins={SCAN_PINS} />
+      </section>
+      <div className="x-wrap x-wrap--gap">
+        <VideoSlot
+          no="03"
+          title="Night — 세안 후 부위별 피부 스캔"
+          len="15초"
+          purpose="퇴근 후 세안한 사용자가 스캔을 받고, 겹친 원으로 결과를 읽는 장면으로 Check · Care를 보여 줍니다."
+          shots={['21:40 세안 후 거울 앞 · 얼굴을 틀에 맞춤', '볼 → T존 → 턱 순서로 측정되는 화면', '겹친 원 결과에서 볼 영역을 터치', '수분 앰플부터 6분 관리 코스 시작']}
+        />
+      </div>
 
       <Cover
         id="tomorrow"
@@ -773,6 +889,13 @@ export default function Showing() {
       <Chapter id="sync" title="거울은 안내하고, 폰은 이어 받는다" lead="화장품을 든 손으로는 거울을 만지기 어렵습니다. 거울은 얼굴 앞에서 안내와 측정을, 폰은 루틴 선택·리모컨·기록 수신을 맡습니다. 오른쪽 폰 화면을 직접 눌러 보세요.">
         <div className="x-sync">
           <SyncDemo />
+          <VideoSlot
+            no="04"
+            title="Mirror × Mobile — 폰으로 이어 받는 거울"
+            len="10초"
+            purpose="손에 화장품을 든 상태에서 폰으로 거울을 조작하는 장면으로 두 기기의 역할 분담을 보여 줍니다."
+            shots={['폰에서 아침 루틴을 고르고 ‘거울로 보내기’', '거울에 안내가 시작되고 폰은 리모컨으로 전환', '폰에서 ‘다음’ · ‘+1분’ 조작', '완료 기록이 폰에 도착']}
+          />
           <p className="note-req">추가 자료 필요 · 거울과 앱의 첫 연결(페어링), 연결이 끊겼을 때의 화면은 기획서·UI에 없어 다루지 않았습니다.</p>
         </div>
       </Chapter>
@@ -864,7 +987,15 @@ export default function Showing() {
       </section>
 
       <section className="x-film">
-        <Placeholder ratio="21 / 9" title="Usage Film · 실제 사용 장면" spec="21:9 · 출근 전 탁상 미러 앞 화장 → 밤 피부 확인 (10~15초 영상 또는 사진)" />
+        <VideoSlot
+          no="05"
+          title="Usage Film — 실제 사용 장면"
+          len="30~45초"
+          ratio="21 / 9"
+          ratioLabel="21:9"
+          purpose="쇼잉 마무리. 실제 공간(욕실 · 화장대)의 탁상 미러와 함께 하루 전체의 사용 장면을 보여 줍니다."
+          shots={['아침: 탁상 위 미러, 출근 준비', '낮: 폰으로 기록 확인', '밤: 세안 후 스캔과 관리', '다음 날 아침: 같은 자리, 바뀐 루틴']}
+        />
       </section>
 
       <footer className="x-credit">

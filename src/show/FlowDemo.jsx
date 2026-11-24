@@ -8,7 +8,7 @@ import { asset } from './parts.jsx';
  *
  * step = { phase, title, desc, img | live: { path, w, h }, hotspot?: { l, t, w, h, label }, auto?: ms, overlay?: node }
  */
-export default function FlowDemo({ steps, ratio = '2390 / 1356', label }) {
+export default function FlowDemo({ steps, ratio = '2390 / 1356', label, variant = '' }) {
   const [i, setI] = useState(0);
   const s = steps[i];
   const last = i === steps.length - 1;
@@ -21,7 +21,7 @@ export default function FlowDemo({ steps, ratio = '2390 / 1356', label }) {
   }, [i]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="flow" role="group" aria-label={label}>
+    <div className={`flow ${variant ? `flow--${variant}` : ''}`} role="group" aria-label={label}>
       <div className="flow__stage">
         <div className="flow__frame" style={{ aspectRatio: ratio }}>
           {steps.map((st, k) => (

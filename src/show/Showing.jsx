@@ -1,99 +1,86 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import FlowDemo from './FlowDemo.jsx';
 import LiveScreen from './LiveScreen.jsx';
 import SyncDemo from './SyncDemo.jsx';
 import ZoomView from './ZoomView.jsx';
-import { MirrorShot, Placeholder, Reveal, SectionHead, asset } from './parts.jsx';
+import { MirrorShot, Placeholder, Reveal, asset } from './parts.jsx';
 import './show.css';
+import './x.css';
 
-const NAV = [
-  ['problem', '문제'],
-  ['research', '리서치'],
-  ['concept', '컨셉'],
-  ['morning', '아침'],
-  ['connect', '연결'],
-  ['night', '저녁'],
-  ['tomorrow', '내일'],
-  ['sync', '연동'],
-  ['system', '디자인'],
-];
+/*
+ * Showing layout follows the Plus X “UNIX” case study rhythm:
+ * cinematic key visual → narrow text blocks (label + body) alternating with full-bleed visuals,
+ * an index slide, statement slides, before/after split, numbered collage, staggered color system, credits.
+ */
 
 /* ---------------- content (기획서 · 실제 UI 근거) ---------------- */
 
-const QUESTIONS = ['바쁜 출근 시간에 화장을 잘 할 수 있을까요?', '내 피부에 맞는 관리를 하고 있을까요?', '매일의 관리로 바라던 피부에 가까워졌을까요?'];
+const INDEX = [
+  ['overview', 'Project Overview'],
+  ['problem', 'Problem Definition'],
+  ['research', 'Research & Insight'],
+  ['persona', 'Persona'],
+  ['concept', 'Design Concept'],
+  ['morning', '001  Morning'],
+  ['connect', '002  Connect'],
+  ['night', '003  Night'],
+  ['tomorrow', '004  Tomorrow'],
+  ['sync', 'Mirror × Mobile'],
+  ['system', 'Design System'],
+  ['screens', 'Screens'],
+];
 
-const RESEARCH = [
-  {
-    tag: 'DAY',
-    title: '바쁜 출근 시간, 시간에 맞춘 화장이 필요하다',
-    stats: [
-      ['67.1%', '30·40대 직장인 여성의 출근 준비 시간 부족 경험', '통계청, 《생활 시간 조사》 (2025.07.28)'],
-      ['32분', '출근 시 평균 화장 시간', '여성조선, 《출근 때 평균 화장 시간》 (2014.03.12)'],
-      ['밀림·양 조절', '기초·색조 메이크업 단계 중 실제 어려움', '오픈서베이, 《뷰티 트렌드 리포트》 (2025)'],
-    ],
-    pairs: [
-      ['출근 준비 중 화장에 일정 시간 이상 소요됨', '내 준비 시간에 맞춘 타이머로 단계별 메이크업을 안내'],
-      ['청장년 직장인 여성 다수가 출근 준비 시간 부족 경험', '화장 종료 5분·10분 전 음성 안내로 시간적 여유 확보'],
-      ['적정량과 위치 파악이 어려워 시간이 지연됨', '음성 안내와 원형 스팟으로 도포량과 위치를 한눈에 안내'],
-    ],
-  },
-  {
-    tag: 'NIGHT',
-    title: '하루 끝 피부 관리, 내게 맞는지 확인이 필요하다',
-    stats: [
-      ['+35.2%', '기능성 화장품 생산액 전년 대비 증가율', '식약처, 《24년 화장품 생산·수출액 사상 최대》 (2025.05.27)'],
-      ['57.2%', '맞춤형 화장품 구매 의사', '식약처, 《맞춤형 화장품 세계 시장 동향 조사》 (2022.02.25)'],
-      ['모공·건조·주름', '30·40대 연령별 주요 피부 고민', '오픈서베이, 《뷰티 트렌드 리포트 2024》 (2024.01.22)'],
-    ],
-    pairs: [
-      ['기능성 화장품 증가에 따른 체계적 관리 니즈 확대', '전날 사용한 제품과 피부 데이터로 제품과 케어를 매칭'],
-      ['맞춤형 화장품 선호 및 개인 맞춤 케어 니즈 증가', '제품별 사용 경험과 피부 고민에 맞춘 관리 제안'],
-      ['연령대에 따라 세분화된 피부 고민', '고민의 종류와 정도를 색과 중첩으로 구분해 시각화'],
-    ],
-  },
+const STATS = [
+  ['DAY', '67.1%', '30·40대 직장인 여성의 출근 준비 시간 부족 경험', '통계청, 《생활 시간 조사》 2025.07.28'],
+  ['NIGHT', '+35.2%', '기능성 화장품 생산액 전년 대비 증가율', '식약처, 《24년 화장품 생산·수출액 사상 최대》 2025.05.27'],
+];
+const STATS_SUB = [
+  ['32분', '출근 시 평균 화장 시간', '여성조선 2014'],
+  ['밀림 · 양 조절', '메이크업 단계 중 실제 어려움', '오픈서베이 2025'],
+  ['57.2%', '맞춤형 화장품 구매 의사', '식약처 2022'],
+  ['모공 · 건조 · 주름', '30·40대 주요 피부 고민', '오픈서베이 2024'],
+];
+const PAIRS = [
+  ['출근 준비 중 화장에 일정 시간 이상 소요', '내 준비 시간에 맞춘 단계별 타이머'],
+  ['적정량과 위치 파악이 어려워 시간 지연', '음성 안내 + 원형 스팟으로 위치·양 안내'],
+  ['기능성·맞춤 케어 니즈 확대', '전날 제품과 피부 데이터로 케어 매칭'],
+  ['연령대별로 세분화된 피부 고민', '고민의 종류와 정도를 색과 중첩으로 시각화'],
 ];
 
 const PERSONAS = [
   {
-    tag: 'PERSONA 01 · DAY / TIME FIRST',
+    time: '08:10',
+    tag: 'Persona 01 · Day / Time First',
     name: '한지우',
     meta: '34세 · 외국계 패션 디자이너',
     quote: '시계를 계속 보지 않아도 출근 시간 늦지 않게 화장을 잘 하고 싶어요',
-    pains: ['건조한 부위가 밀리고 들떠서 화장 수정 시간이 길어진다', '시간을 확인하면서 영상과 거울을 번갈아 보기가 번거롭다'],
-    needs: ['출발 시각과 자신의 속도·피부에 맞춘 단계별 안내', '거울을 보면서 바로 따라 할 수 있는 위치·양 안내'],
+    needs: ['출발 시각과 내 속도·피부에 맞춘 단계별 안내', '거울을 보면서 바로 따라 할 수 있는 위치·양 안내'],
   },
   {
-    tag: 'PERSONA 02 · NIGHT / CARE FIRST',
+    time: '21:40',
+    tag: 'Persona 02 · Night / Care First',
     name: '윤서진',
     meta: '45세 · 금융 애널리스트',
     quote: '퇴근 후 매일 밤 관리하고 있지만, 내 피부에 맞고 건강해지는지 궁금해요',
-    pains: ['복잡한 제품 사용 속에서 내 피부가 언제 편안했는지 모른다', '피부 고민이 부위마다 달라 출근 화장부터 관리까지 어렵다'],
-    needs: ['사용한 제품과 피부 변화를 간편하게 연결해 기록', '출근부터 퇴근까지 하루의 피부 관리가 이어지는 경험'],
+    needs: ['사용한 제품과 피부 변화를 간편하게 연결해 기록', '출근부터 퇴근까지 이어지는 하루의 피부 관리'],
   },
 ];
 
 const KEYWORDS = [
-  ['Clear', '명료한', '한눈에 알기 쉽게'],
-  ['Guided', '안내하는', '따라 하기 쉽게'],
-  ['Adaptive', '맞추는', '상황과 피부에 맞게'],
-  ['Layered', '중첩되는', '겹쳐 쌓이는 정보와 수치'],
+  ['Clear', '한눈에 알기 쉽게'],
+  ['Guided', '따라 하기 쉽게'],
+  ['Adaptive', '상황과 피부에 맞게'],
+  ['Layered', '겹쳐 쌓이는 정보'],
 ];
 
 const LOOP = [
-  { n: '01', en: 'Fit Time', ko: '시간 맞춤', d: '출근 상황과 내 피부에 맞게 화장 단계를 구성·조정', to: 'morning', t: 'DAY' },
-  { n: '02', en: 'Follow', ko: '화장 안내', d: 'AI 음성과 화장 위치 점선 트레이싱 가이드로 안내', to: 'morning', t: 'DAY' },
-  { n: '03', en: 'Connect', ko: '기록 연결', d: '제품·수정 부위·피부 상태를 남겨 저녁 관리로 연결', to: 'connect', t: 'DAY' },
-  { n: '04', en: 'Check', ko: '피부 확인', d: '세안 후 고민 부위와 컨디션을 고려해 정밀 확인', to: 'night', t: 'NIGHT' },
-  { n: '05', en: 'Care', ko: '맞춤 관리', d: '하루 데이터와 피부 상태에 맞춰 관리 순서 안내', to: 'night', t: 'NIGHT' },
-  { n: '06', en: 'Review', ko: '변화 확인', d: '고민별 수치와 개선도를 기반으로 내일 루틴 제안', to: 'tomorrow', t: 'NEXT' },
-];
-
-const CHAPTERS = [
-  { id: 'morning', n: '001', en: 'Morning', ko: '아침 · 시간 맞춤과 안내', steps: '01 Fit Time · 02 Follow', tags: ['#시간 맞춤', '#메이크업 가이드', '#보정 기록'] },
-  { id: 'connect', n: '002', en: 'Connect', ko: '연결 · 아침에서 저녁으로', steps: '03 Connect', tags: ['#사용 제품', '#보정 부위', '#유지 시간'] },
-  { id: 'night', n: '003', en: 'Night', ko: '저녁 · 확인과 맞춤 관리', steps: '04 Check · 05 Care', tags: ['#부위별 스캔', '#겹친 원', '#관리 코스'] },
-  { id: 'tomorrow', n: '004', en: 'Tomorrow', ko: '내일 · 변화와 루틴 반영', steps: '06 Review · Routine', tags: ['#변화 추이', '#AI 제안', '#루프'] },
+  { n: '01', en: 'Fit Time', ko: '시간 맞춤', to: 'morning', t: 'day' },
+  { n: '02', en: 'Follow', ko: '화장 안내', to: 'morning', t: 'day' },
+  { n: '03', en: 'Connect', ko: '기록 연결', to: 'connect', t: 'day' },
+  { n: '04', en: 'Check', ko: '피부 확인', to: 'night', t: 'night' },
+  { n: '05', en: 'Care', ko: '맞춤 관리', to: 'night', t: 'night' },
+  { n: '06', en: 'Review', ko: '변화 확인', to: 'tomorrow', t: 'next' },
 ];
 
 const MORNING_STEPS = [
@@ -101,21 +88,21 @@ const MORNING_STEPS = [
     phase: '사용 전',
     title: '거울이 먼저 켜진다',
     img: 'home.png',
-    desc: '08:10, 거울 앞에 서면 어제 저녁 기록을 바탕으로 “볼이 계속 건조해요”를 먼저 알려 줍니다. 오늘 피부 상태를 확인한 뒤 메이크업 탭으로 이동합니다.',
+    desc: '08:10, 거울 앞에 서면 어제 저녁 기록을 바탕으로 “볼이 계속 건조해요”를 먼저 알려 줍니다. 오른쪽 메뉴의 메이크업 탭을 눌러 보세요.',
     hotspot: { l: 91.6, t: 24.2, w: 5.8, h: 7.6, label: '메이크업 탭', tip: 'left' },
   },
   {
     phase: '조작 → 화면 변화',
     title: '지금 할 행동 한 줄',
     img: 'makeup.png',
-    desc: '얼굴 위에는 “광대 위쪽에 가볍게 두드려요” 한 줄과 진행 바(블러셔 3/4 · 4분 남음)만 둡니다. 사용할 제품과 가이드 영상은 얼굴 밖 패널로 옮겨 거울을 가리지 않습니다.',
+    desc: '얼굴 위에는 “광대 위쪽에 가볍게 두드려요” 한 줄과 진행 바(블러셔 3/4 · 4분 남음)만 둡니다. 제품과 가이드 영상은 얼굴 밖 패널로 옮겼습니다.',
     hotspot: { l: 72.3, t: 89.2, w: 17.1, h: 6.4, label: '다음 단계', tip: 'top' },
   },
   {
     phase: '사용 결과',
     title: '보정 부위까지 기록',
     live: { path: '/mirror/makeup/done', w: 1440, h: 817 },
-    desc: '18분 / 예상 20분. 4단계 중 3단계는 좋고, 블러셔 오른쪽 1곳은 “1cm 아래로” 보정을 권합니다. 화면의 ‘거울 / 결과 체크’를 직접 눌러 보세요. 사용한 제품은 피부 기록에 자동 저장됩니다.',
+    desc: '18분 / 예상 20분. 블러셔 오른쪽 1곳은 “1cm 아래로” 보정을 권합니다. 화면의 ‘거울 / 결과 체크’를 직접 눌러 보세요. 사용 제품은 피부 기록에 자동 저장됩니다.',
   },
 ];
 
@@ -132,20 +119,20 @@ const NIGHT_STEPS = [
     title: '부위별 순서 측정',
     img: 'scan-progress.png',
     auto: 3200,
-    desc: '볼 → T존 → 턱 → 얼굴 전체 순서로 측정합니다. 지금 재는 부위가 거울 위에 바로 표시되고, 오른쪽 목록에서 진행 상태(2/4)를 확인합니다. 측정이 끝나면 자동으로 결과로 넘어갑니다.',
+    desc: '볼 → T존 → 턱 → 얼굴 전체 순서로 측정합니다. 지금 재는 부위가 거울 위에 바로 표시되고, 끝나면 자동으로 결과로 넘어갑니다.',
   },
   {
     phase: '결과 읽기',
     title: '겹친 원으로 읽기',
     img: 'scan-result.png',
-    desc: '원이 클수록 고민 범위가 넓고, 많이 겹칠수록 오래 진행된 상태입니다. 수분 42 · 유분 58 · 피부결 71, 아침의 “세미 매트 쿠션 13시간 유지” 기록이 건조의 이유로 연결됩니다.',
+    desc: '원이 클수록 범위가 넓고, 많이 겹칠수록 오래 진행된 상태입니다. 아침의 “세미 매트 쿠션 13시간 유지” 기록이 건조의 이유로 연결됩니다. 볼 영역을 눌러 보세요.',
     hotspot: { l: 16, t: 46.5, w: 13.5, h: 12, label: '볼 영역', tip: 'top' },
   },
   {
     phase: '사용 결과',
     title: '오늘의 관리 코스',
     img: 'scan-detail.png',
-    desc: '오늘 목표는 수분 60(지금 42). 관리하면 2~3일 안에 회복된다고 알려 주고, 수분 앰플(볼에 2방울)부터 6분 관리 코스로 바로 이어집니다. 화장품만 또는 디바이스 포함을 고를 수 있습니다.',
+    desc: '오늘 목표는 수분 60(지금 42). 관리하면 2~3일 안에 회복된다고 알려 주고, 수분 앰플(볼에 2방울)부터 6분 관리 코스로 바로 이어집니다.',
   },
 ];
 
@@ -154,7 +141,7 @@ const ROUTINE_STEPS = [
     phase: '사용 전',
     title: 'AI가 제안한다',
     img: 'routine.png',
-    desc: '쌓인 기록을 바탕으로 “기초에 수분 앰플 1분을 더할까요?”를 제안합니다. 바뀌는 값(기초 3→4분 · 총 14→15분 · 시작 07:50→07:49)을 미리 보여 준 뒤 선택하게 합니다.',
+    desc: '쌓인 기록으로 “기초에 수분 앰플 1분을 더할까요?”를 제안합니다. 바뀌는 값(기초 3→4분 · 시작 07:50→07:49)을 미리 보여 준 뒤 선택하게 합니다.',
     hotspot: { l: 64.9, t: 72.8, w: 11, h: 5.4, label: '추가', tip: 'top' },
   },
   {
@@ -167,23 +154,23 @@ const ROUTINE_STEPS = [
         <span>내일 아침 07:49 시작 · 기초 4분</span>
       </div>
     ),
-    desc: '‘추가’를 누르면 내일 아침 루틴이 07:49 시작으로 바뀌고 보습 단계가 1분 늘어납니다. ‘피부 기록에 맞춰 자동 조정’을 켜 두면 건조한 날마다 같은 방식으로 조정됩니다.',
+    desc: '‘추가’를 누르면 내일 아침 루틴이 07:49 시작으로 바뀌고 보습 단계가 1분 늘어납니다. 저장하면 다음 날 첫 화면에 반영됩니다.',
     hotspot: { l: 63.1, t: 89.4, w: 26.3, h: 6.2, label: '저장', tip: 'top' },
   },
   {
     phase: '사용 결과',
     title: '다음 날 첫 화면',
     img: 'home.png',
-    desc: '오늘의 결과가 다음 날 첫 화면이 됩니다. 아침의 거울은 다시 어제 기록으로 오늘 피부를 알려 주며, 하루가 처음으로 이어집니다.',
+    desc: '오늘의 결과가 다음 날 첫 화면이 됩니다. 거울은 다시 어제 기록으로 오늘 피부를 알려 주고, 하루가 처음으로 이어집니다.',
   },
 ];
 
 const CHANGE_REGIONS = [
-  { key: 'all', label: '전체', x: 0, y: 0, w: 100, h: 100, title: '변화 · 쌓이면 보이는 변화', desc: '피부 지수 추이, 종합 점수, 한 줄 요약, 피부 나이를 한 화면에 모았습니다. 영역을 눌러 확대해 보세요.' },
-  { key: 'trend', label: '7주 추이', x: 3, y: 15, w: 58, h: 57, title: '관리한 날부터 오르는 그래프', desc: '파란 칸은 관리를 이어 간 최근 4주(스캔 24회)입니다. 최저 31에서 최고 68까지, 최근 4주 변화는 +18%. 전체·이마·볼·턱으로 부위를 바꿔 볼 수 있습니다.' },
-  { key: 'score', label: '점수 · 요약', x: 63, y: 14, w: 27, h: 31, title: '숫자 하나, 문장 하나', desc: '종합 피부 점수 72(지난 스캔 대비 ▲4)와 “수분이 4주째 오르고 있어요. 유분은 T존 위주로 높아요.” 한 줄 요약으로 결과를 읽기 쉽게 정리합니다.' },
-  { key: 'age', label: '피부 나이', x: 63, y: 46, w: 27, h: 50, title: '피부 나이 27세', desc: '3월 대비 2세 낮아졌고, 지금 추세라면 12월까지의 예상치를 함께 보여 줍니다. 적정선 대비 위치를 그래프로 확인합니다.' },
-  { key: 'parts', label: '항목별', x: 4, y: 79, w: 57, h: 15, title: '항목별 지수', desc: '수분 36% · 유분 64% · 모공 20% · 모공 40%를 원형 지표로 보여 줍니다. (Figma 원본에서 ‘모공’이 두 번 표기되어 마지막 항목명 확인이 필요합니다.)' },
+  { key: 'all', label: '전체', x: 0, y: 0, w: 100, h: 100, title: '쌓이면 보이는 변화', desc: '피부 지수 추이, 종합 점수, 한 줄 요약, 피부 나이를 한 화면에 모았습니다. 영역을 눌러 확대해 보세요.' },
+  { key: 'trend', label: '7주 추이', x: 3, y: 15, w: 58, h: 57, title: '관리한 날부터 오르는 그래프', desc: '파란 칸은 관리를 이어 간 최근 4주(스캔 24회)입니다. 최저 31에서 최고 68까지, 최근 4주 변화 +18%.' },
+  { key: 'score', label: '점수 · 요약', x: 63, y: 14, w: 27, h: 31, title: '숫자 하나, 문장 하나', desc: '종합 피부 점수 72(▲4)와 “수분이 4주째 오르고 있어요” 한 줄 요약으로 결과를 정리합니다.' },
+  { key: 'age', label: '피부 나이', x: 63, y: 46, w: 27, h: 50, title: '피부 나이 27세', desc: '3월 대비 2세 낮아졌고, 지금 추세라면 12월까지의 예상치를 함께 보여 줍니다.' },
+  { key: 'parts', label: '항목별', x: 4, y: 79, w: 57, h: 15, title: '항목별 지수', desc: '수분 36% · 유분 64% · 모공 20% · 모공 40%. (Figma 원본에 ‘모공’이 두 번 표기되어 마지막 항목명 확인이 필요합니다.)' },
 ];
 
 const CONNECT_TILES = [
@@ -193,45 +180,44 @@ const CONNECT_TILES = [
 ];
 
 const FEEDBACK = [
-  ['가독성 · 대비 확보', ['흰 글씨 대신 진한 회색 텍스트 #222222', '반투명 흰 글라스 카드로 배경과 분리', '얼굴 위 정보는 행동 한 줄만 노출', '어두운 스크림 대신 밝은 카드 방식']],
-  ['정보 위계 개선', ['본문 17px 이상, 대표 수치 44px', '화면별 핵심 요소 1개로 집중', '진행: 지금 할 행동 / 홈: 시작할 루틴', '상세 내용은 패널·다음 화면으로 분리']],
-  ['핵심 정보 3개로 축소', ['메이크업 진행 화면의 핵심 3가지', '지금 해야 할 행동 · 바를 부위 · 사용할 제품', '단계 목록·도구·다음 제품은 필요 시 노출']],
+  ['Contrast', '가독성 · 대비', '흰 글씨 대신 #222 텍스트, 반투명 흰 글라스 카드로 거울 배경과 분리'],
+  ['Hierarchy', '정보 위계', '본문 17px 이상 · 대표 수치 44px, 화면마다 핵심 요소 1개에 집중'],
+  ['Three Things', '핵심 정보 3개', '지금 할 행동 · 바를 부위 · 사용할 제품만 얼굴 앞에, 나머지는 패널로'],
 ];
 
 const COLORS = [
-  ['#3E8EDE', 'Accent', '선택 · 알림 · 오늘 데이터'],
-  ['#222222', 'Ink', '본문 · 큰 수치'],
-  ['#666666', 'Ink 2', '카드 라벨'],
-  ['#8A8A8A', 'Ink 3', '보조 라벨'],
-  ['#F4F4F4', 'Surface 2', '카드 · 트랙'],
-  ['#E4F0FB', 'Accent Soft', '선택 배경'],
+  { hex: '#3E8EDE', name: 'Trace Blue', role: '01 Primary', use: '선택 · 알림 · 오늘 데이터', size: 'xl' },
+  { hex: '#222222', name: 'Ink', role: '02 Primary', use: '본문 · 큰 수치', size: 'lg' },
+  { hex: '#F4F4F4', name: 'Surface', role: '03 System', use: '카드 · 트랙', size: 'sm' },
+  { hex: '#8A8A8A', name: 'Ink 3', role: '04 System', use: '보조 라벨', size: 'sm' },
+  { hex: '#E4F0FB', name: 'Accent Soft', role: '05 Point', use: '선택 배경', size: 'sm' },
 ];
 
 const TYPE = [
   ['44', '300', '대표 수치', '72'],
   ['30', '500', '카드 헤드라인', '볼이 건조해요'],
   ['22', '500', '인사말 · 화면 제목', '좋은 아침이에요'],
-  ['17', '400', '안내 문구 · 리스트', '광대 위쪽에 가볍게 두드려요'],
+  ['17', '400', '안내 문구', '광대 위쪽에 가볍게 두드려요'],
   ['13', '400', '보조 설명', '어제 저녁 기록 기준'],
 ];
 
 const MENU = [
-  ['home', '홈', 'DAY/NIGHT 바쁜 아침과 하루 끝에 필요한 핵심 정보'],
-  ['makeup', '메이크업', '단계별 영상, AI 음성, 화장 위치 점선 트레이싱 가이드'],
-  ['skin', '관리', 'DAY/NIGHT 피부 확인과 맞춤 관리 순서'],
-  ['trend', '변화', '고민 부위·영역별 피부 데이터로 변화 확인'],
-  ['gear', '설정', '제품·루틴 등 고민과 타입에 맞춘 서비스 설정'],
+  ['home', 'Home', '홈'],
+  ['makeup', 'Make Up', '메이크업'],
+  ['skin', 'Care', '관리'],
+  ['trend', 'Change', '변화'],
+  ['gear', 'Setting', '설정'],
 ];
 
 const MIRROR_STRIP = [
-  ['home.png', 'HOME · 오늘 피부'],
-  ['makeup.png', 'Make Up · 단계 안내'],
-  ['scan-ready.png', 'Scan Ready · 스캔 준비'],
-  ['scan-progress.png', 'Skin Scan · 부위별 측정'],
-  ['scan-result.png', 'Scan Result · 겹친 원'],
-  ['scan-detail.png', '부위 상세 · 관리 코스'],
-  ['change.png', 'Change · 변화'],
-  ['routine.png', '루틴 설정 · AI 제안'],
+  ['home.png', 'HOME'],
+  ['makeup.png', 'Make Up'],
+  ['scan-ready.png', 'Scan Ready'],
+  ['scan-progress.png', 'Skin Scan'],
+  ['scan-result.png', 'Scan Result'],
+  ['scan-detail.png', 'Care Course'],
+  ['change.png', 'Change'],
+  ['routine.png', 'Routine'],
 ];
 
 const PHONE_STRIP = [
@@ -245,13 +231,15 @@ const PHONE_STRIP = [
   ['/app/mirror/done', '완료 기록 수신'],
 ];
 
-/* ---------------- page ---------------- */
+/* ---------------- building blocks ---------------- */
 
-function TopBar() {
+function Header() {
+  const [solid, setSolid] = useState(false);
   const [p, setP] = useState(0);
   useEffect(() => {
     const on = () => {
       const h = document.documentElement;
+      setSolid(h.scrollTop > window.innerHeight * 0.85);
       setP(h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight));
     };
     on();
@@ -259,38 +247,99 @@ function TopBar() {
     return () => window.removeEventListener('scroll', on);
   }, []);
   return (
-    <header className="topbar">
-      <a href="#top" className="topbar__logo" aria-label="Trac:ing 처음으로">
-        <img src={`${import.meta.env.BASE_URL}logo-tracing.png`} alt="Trac:ing" width="92" height="25" />
+    <header className={`x-head ${solid ? 'is-solid' : ''}`}>
+      <a href="#top" className="x-head__logo" aria-label="Trac:ing 처음으로">
+        Trac<span>:</span>ing
       </a>
-      <nav className="topbar__nav" aria-label="섹션">
-        {NAV.map(([id, label]) => (
-          <a key={id} href={`#${id}`}>
-            {label}
-          </a>
-        ))}
+      <nav className="x-head__nav" aria-label="바로가기">
+        <a href="#index">Index</a>
+        <a href="#morning">Showing</a>
+        <a className="x-head__cta" href="#/screens">
+          Prototype <Icon name="arrowUpRight" size={14} />
+        </a>
       </nav>
-      <a className="topbar__cta" href="#/screens">
-        프로토타입 <Icon name="arrowUpRight" size={16} />
-      </a>
-      <span className="topbar__progress" style={{ transform: `scaleX(${p})` }} aria-hidden="true" />
+      <span className="x-head__bar" style={{ transform: `scaleX(${p})` }} aria-hidden="true" />
     </header>
   );
 }
 
-function ChapterHead({ c, title, message, children }) {
+/** Narrow centred text block — “Brand Definition” style: small bold label, then body. */
+function TextBlock({ id, label, children, wide }) {
   return (
-    <Reveal className="ch-head">
-      <div className="ch-head__meta">
-        <span className="ch-head__n">{c.n}</span>
-        <span className="ch-head__en">{c.en}</span>
-        <span className="ch-head__ko">{c.ko}</span>
-        <span className="ch-head__steps">{c.steps}</span>
-      </div>
-      <h3 className="h-chapter">{title}</h3>
-      <p className="ch-head__msg">{message}</p>
-      {children}
+    <Reveal className={`x-text ${wide ? 'x-text--wide' : ''}`} id={id}>
+      <h2 className="x-text__label">{label}</h2>
+      <div className="x-text__body">{children}</div>
     </Reveal>
+  );
+}
+
+/** Big statement slide — label, one huge english line, korean line. */
+function Statement({ label, en, ko, tone = 'grey' }) {
+  return (
+    <Reveal className={`x-state x-state--${tone}`}>
+      <span className="x-state__label">{label}</span>
+      <p className="x-state__en">{en}</p>
+      <p className="x-state__ko">{ko}</p>
+    </Reveal>
+  );
+}
+
+/** Full-bleed chapter cover. */
+function Cover({ id, n, en, title, ko, tone, art }) {
+  return (
+    <section className={`x-cover x-cover--${tone}`} id={id}>
+      <div className="x-cover__art" aria-hidden="true">
+        {art}
+      </div>
+      <div className="x-cover__in">
+        <span className="x-cover__n">
+          {n} — {en}
+        </span>
+        <h2 className="x-cover__title">{title}</h2>
+        <p className="x-cover__ko">{ko}</p>
+      </div>
+    </section>
+  );
+}
+
+/** Dotted tracing outline of a face, drawn on with a mask; used as the brand key visual. */
+function TraceFace({ spots = true, className = '' }) {
+  const face = 'M200 70 C268 70 312 124 312 196 C312 270 266 330 200 330 C134 330 88 270 88 196 C88 124 132 70 200 70 Z';
+  const body = 'M40 470 C52 398 112 362 200 362 C288 362 348 398 360 470';
+  const mid = `trace-${useId().replace(/:/g, '')}`;
+  return (
+    <svg className={`trace ${className}`} viewBox="0 0 400 480" fill="none">
+      <defs>
+        <mask id={mid}>
+          <path d={face} pathLength="1" className="trace__draw" />
+          <path d={body} pathLength="1" className="trace__draw trace__draw--2" />
+        </mask>
+      </defs>
+      <g mask={`url(#${mid})`}>
+        <path d={face} className="trace__dot" />
+        <path d={body} className="trace__dot" />
+      </g>
+      {spots && (
+        <g className="trace__spots">
+          <circle cx="138" cy="226" r="22" />
+          <circle cx="262" cy="226" r="22" />
+          <circle cx="200" cy="146" r="14" className="is-warm" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
+/** Desk mirror product shot (rendered, not a photo) showing a real screen. */
+function DeskMirror({ src, alt, children }) {
+  return (
+    <div className="desk">
+      <div className="desk__mirror">
+        <div className="desk__screen">{children || <img src={asset(src)} alt={alt} loading="lazy" decoding="async" />}</div>
+      </div>
+      <span className="desk__neck" aria-hidden="true" />
+      <span className="desk__base" aria-hidden="true" />
+    </div>
   );
 }
 
@@ -350,10 +399,28 @@ function ConnectDemo() {
   );
 }
 
+/** Follow guide diagram: dotted tracing line + circular spots, as described in the plan (diagram, not a captured screen). */
+function FollowDiagram() {
+  return (
+    <figure className="follow">
+      <div className="follow__stage">
+        <TraceFace className="trace--follow" />
+        <span className="follow__line">광대 위쪽에 가볍게 두드려요</span>
+        <span className="follow__bar">
+          <i />
+          블러셔 3/4 · 4분 남음
+        </span>
+      </div>
+      <figcaption>도식 · 점선 트레이싱과 원형 스팟으로 도포 위치와 양을 안내 (실제 화면 클로즈업은 추가 자료 필요)</figcaption>
+    </figure>
+  );
+}
+
+/* ---------------- page ---------------- */
+
 export default function Showing() {
   useEffect(() => {
     document.title = 'Trac:ing — 하루를 이어서 기억하는 거울';
-    // deep links like …/#night: the section only exists after render, so scroll once it does
     const id = decodeURIComponent(window.location.hash.slice(1));
     if (id && !id.startsWith('/')) {
       requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: 'instant', block: 'start' }));
@@ -361,430 +428,429 @@ export default function Showing() {
   }, []);
 
   return (
-    <div className="show" id="top">
-      <TopBar />
+    <div className="show x" id="top">
+      <Header />
 
-      {/* 00 · HERO ------------------------------------------------ */}
-      <section className="hero">
-        <div className="wrap hero__top">
-          <dl className="hero__meta">
-            <div>
-              <dt>Stu.</dt>
-              <dd>22565053 조윤정</dd>
-            </div>
-            <div>
-              <dt>Prof.</dt>
-              <dd>김승언 교수님</dd>
-            </div>
-            <div>
-              <dt>Date.</dt>
-              <dd>2026.11.17</dd>
-            </div>
-          </dl>
-          <span className="hero__course">Interaction Design</span>
-        </div>
-        <div className="wrap hero__title">
-          <h1 className="wordmark">
-            Trac<span className="wordmark__colon">:</span>ing
+      {/* KEY VISUAL ------------------------------------------------ */}
+      <section className="x-hero">
+        <div className="x-hero__sky" aria-hidden="true" />
+        <TraceFace className="trace--hero" />
+        <div className="x-hero__in">
+          <h1 className="x-hero__title">
+            The Mirror
+            <br />
+            That Remembers
+            <br />
+            Your Day
           </h1>
-          <div className="hero__tag">
-            <p className="hero__tagline">매일을 쉽고 나답게</p>
-            <p className="hero__sub">아침 출근부터 밤 관리까지, 나를 위한 탁상용 뷰티 미러</p>
-          </div>
+          <p className="x-hero__ko">하루를 이어서 기억하는 거울, Trac:ing</p>
         </div>
-        <Reveal className="wrap hero__visual">
-          <div className="hero__stage">
-            <MirrorShot src="home.png" alt="Trac:ing 미러 홈 화면 · 08:10 볼이 계속 건조해요" eager />
-          </div>
-          <div className="hero__caption">
-            <p className="hero__lead">
-              아침 화장 기록이 저녁 피부 관리로, 저녁 결과가 다음 날 아침 루틴으로 이어집니다. <b>하루를 이어서 기억하는 거울</b>, Trac:ing입니다.
-            </p>
-            <a className="hero__scroll" href="#problem">
-              스크롤해서 하루 따라가기 ↓
+        <p className="x-hero__foot">
+          <span>Trac:ing — Desk Beauty Mirror &amp; App</span>
+          <span>Interaction Design 2026 · 22565053 조윤정 · 김승언 교수님</span>
+        </p>
+        <a className="x-hero__scroll" href="#overview" aria-label="아래로">
+          Scroll
+        </a>
+      </section>
+
+      {/* OVERVIEW + INDEX ----------------------------------------- */}
+      <TextBlock id="overview" label="Project Overview">
+        <p>
+          Trac:ing은 아침 출근부터 밤 관리까지, 나를 위한 탁상용 뷰티 미러입니다. 아침에는 출근 시간에 맞춰 메이크업을 안내하고, 그 기록을 저녁 피부 확인으로 넘기며, 저녁의 결과를 다음 날 아침 루틴에 반영합니다. 화장과 관리가 따로
+          놀지 않도록, 하루를 하나로 이어서 기억하는 거울을 디자인했습니다.
+        </p>
+      </TextBlock>
+
+      <section className="x-index" id="index">
+        <Reveal className="x-index__in">
+          <p className="x-index__logo">
+            Trac<span>:</span>ing
+          </p>
+          <ol className="x-index__list">
+            {INDEX.map(([id, label]) => (
+              <li key={id}>
+                <a href={`#${id}`}>{label}</a>
+              </li>
+            ))}
+          </ol>
+        </Reveal>
+      </section>
+
+      {/* PRODUCT IN CONTEXT ---------------------------------------- */}
+      <section className="x-product">
+        <Reveal className="x-product__in">
+          <DeskMirror src="home.png" alt="Trac:ing 미러 홈 화면 · 08:10 볼이 계속 건조해요" />
+        </Reveal>
+        <p className="x-product__cap">
+          <b>08:10</b> 거울 앞에 서면, 어제의 기록이 오늘의 피부를 먼저 알려 줍니다.
+        </p>
+      </section>
+
+      {/* PROBLEM ---------------------------------------------------- */}
+      <TextBlock id="problem" label="Problem Definition">
+        <p>
+          출근을 준비하는 아침엔 시간이 없고, 저녁엔 오늘 내 피부가 어땠는지 기억나지 않습니다. 화장은 화장대로, 관리는 관리대로 따로 놀기 때문입니다. 바쁜 출근 시간에 화장을 잘 할 수 있을지, 내 피부에 맞는 관리를 하고 있는지,
+          매일의 관리로 바라던 피부에 가까워졌는지 — 세 가지 질문에서 시작했습니다.
+        </p>
+      </TextBlock>
+
+      <section className="x-split">
+        <Reveal className="x-split__card x-split__card--before">
+          <span className="x-split__k">Before</span>
+          <p className="x-split__en">
+            Makeup and care,
+            <br />
+            living apart
+          </p>
+          <ul className="x-split__ko">
+            <li>시계와 영상, 거울을 번갈아 보는 아침</li>
+            <li>어디를 몇 번 고쳤는지 남지 않는 기록</li>
+            <li>내 피부에 맞는지 모르는 저녁 관리</li>
+          </ul>
+        </Reveal>
+        <Reveal className="x-split__card x-split__card--after" delay={120}>
+          <span className="x-split__k">With Trac:ing</span>
+          <p className="x-split__en">
+            One day,
+            <br />
+            traced as one
+          </p>
+          <ul className="x-split__ko">
+            <li>출근 시간에 맞춰 거울이 먼저 안내</li>
+            <li>보정 부위와 사용 제품이 저녁으로 연결</li>
+            <li>저녁 결과가 내일 아침 루틴으로 반영</li>
+          </ul>
+        </Reveal>
+      </section>
+
+      {/* RESEARCH --------------------------------------------------- */}
+      <TextBlock id="research" label="Research & Insight">
+        <p>출근 준비 시간의 부족과 밀림·양 조절의 어려움, 그리고 내게 맞는 관리에 대한 수요. 숫자는 하루 중 두 개의 순간을 가리켰고, 각 인사이트를 기능으로 연결했습니다.</p>
+      </TextBlock>
+
+      <section className="x-stats">
+        <div className="x-stats__big">
+          {STATS.map(([tag, v, l, src], k) => (
+            <Reveal className="x-stat" key={v} delay={k * 120}>
+              <span className="x-stat__tag">{tag}</span>
+              <b className="x-stat__v">{v}</b>
+              <span className="x-stat__l">{l}</span>
+              <span className="x-stat__src">{src}</span>
+            </Reveal>
+          ))}
+        </div>
+        <ul className="x-stats__sub">
+          {STATS_SUB.map(([v, l, src]) => (
+            <li key={l}>
+              <b>{v}</b>
+              <span>{l}</span>
+              <i>{src}</i>
+            </li>
+          ))}
+        </ul>
+        <ol className="x-pairs">
+          {PAIRS.map(([ins, fn], k) => (
+            <Reveal as="li" key={ins} delay={k * 60}>
+              <span className="x-pairs__n">0{k + 1}</span>
+              <span className="x-pairs__ins">{ins}</span>
+              <span className="x-pairs__arrow" aria-hidden="true">
+                →
+              </span>
+              <span className="x-pairs__fn">{fn}</span>
+            </Reveal>
+          ))}
+        </ol>
+      </section>
+
+      {/* PERSONA ---------------------------------------------------- */}
+      <TextBlock id="persona" label="Persona">
+        <p>출근 준비에 쫓기는 30대에게는 시간에 맞춘 음성 화장 가이드를, 퇴근 후 관리가 고민인 40대에게는 부위별 관리 안내와 변화 기록을 제공합니다.</p>
+      </TextBlock>
+
+      <section className="x-persona">
+        {PERSONAS.map((p, k) => (
+          <Reveal className={`x-persona__half x-persona__half--${k ? 'night' : 'day'}`} key={p.name} delay={k * 120}>
+            <span className="x-persona__time">{p.time}</span>
+            <div className="x-persona__body">
+              <span className="x-persona__tag">{p.tag}</span>
+              <h3 className="x-persona__name">
+                {p.name} <small>{p.meta}</small>
+              </h3>
+              <p className="x-persona__quote">“{p.quote}”</p>
+              <ul>
+                {p.needs.map((x) => (
+                  <li key={x}>{x}</li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        ))}
+      </section>
+
+      {/* CONCEPT ---------------------------------------------------- */}
+      <TextBlock id="concept" label="Design Concept · Tracing Paper">
+        <p>트레이싱지처럼 필요한 위치와 정보, 관리 방법을 그 자리에 짚어 주고, 상황에 맞춰 기록을 누적·중첩해 전달합니다. 내 상황에 맞게, 따라 하기 쉽게, 내 피부에 맞게.</p>
+      </TextBlock>
+
+      <section className="x-states">
+        <Statement label="Concept" en="Trace what matters, layer every day." ko="필요한 곳을 짚어 주고, 하루를 겹쳐 쌓는다" />
+        <div className="x-layers" aria-hidden="true">
+          <span className="x-layers__sheet">Morning record</span>
+          <span className="x-layers__sheet">Night scan</span>
+          <span className="x-layers__sheet">Tomorrow routine</span>
+        </div>
+        <Statement label="Keywords" en="Clear. Guided. Adaptive. Layered." ko="한눈에 알기 쉽게 · 따라 하기 쉽게 · 상황과 피부에 맞게 · 겹쳐 쌓이는 정보" />
+        <ul className="x-keys">
+          {KEYWORDS.map(([en, ko]) => (
+            <li key={en}>
+              <b>{en}</b>
+              <span>{ko}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <TextBlock label="Service Experience">
+        <p>하루는 여섯 단계로 한 바퀴 돌고, 다음 날 다시 01로 돌아옵니다. 아래 네 장면에서 각 단계를 실제 화면으로 눌러 볼 수 있습니다.</p>
+      </TextBlock>
+      <ol className="x-loop">
+        {LOOP.map((l) => (
+          <li key={l.n}>
+            <a href={`#${l.to}`} className={`x-loop__item is-${l.t}`}>
+              <span>{l.n}</span>
+              <b>{l.en}</b>
+              <i>{l.ko}</i>
             </a>
+          </li>
+        ))}
+        <li className="x-loop__back">↺</li>
+      </ol>
+
+      {/* 001 MORNING ------------------------------------------------ */}
+      <Cover id="morning" n="001" en="Morning" tone="morning" title="Fit Time & Follow" ko="출근 시간에 맞춰, 거울이 먼저 켜진다" art={<span className="x-sun" />} />
+      <TextBlock label="Scenario · 08:10">
+        <p>시계를 보지 않아도 거울이 시간과 순서를 챙깁니다. 사용자는 따라 하기만 하면 되고, 어디를 몇 번 보정했는지도 함께 기록됩니다. 화면 위 파란 테두리(TAP)를 눌러 직접 진행해 보세요.</p>
+      </TextBlock>
+      <section className="x-band x-band--morning">
+        <FlowDemo steps={MORNING_STEPS} label="아침 메이크업 흐름" variant="cinema" />
+      </section>
+      <section className="x-collage">
+        <Reveal className="x-collage__a">
+          <span className="x-collage__n">01</span>
+          <FollowDiagram />
+        </Reveal>
+        <Reveal className="x-collage__b" delay={100}>
+          <span className="x-collage__n">02</span>
+          <div className="x-tile x-tile--timer">
+            <span className="x-tile__k">Timer</span>
+            <b className="x-tile__big">20:00</b>
+            <p>출근 시각을 기준으로 단계별 남은 시간을 보여 줘, 따로 시계를 볼 필요가 없습니다.</p>
+          </div>
+        </Reveal>
+        <Reveal className="x-collage__c" delay={200}>
+          <span className="x-collage__n">03</span>
+          <div className="x-tile x-tile--voice">
+            <span className="x-tile__k">Voice</span>
+            <span className="x-wave" aria-hidden="true">
+              {Array.from({ length: 18 }, (_, k) => (
+                <i key={k} style={{ animationDelay: `${(k % 6) * 0.12}s` }} />
+              ))}
+            </span>
+            <p>“화장 종료 5분 전이에요.” 끝나기 전에 음성으로 알려 시간 부족을 막고, 마이크 버튼으로 음성 명령도 할 수 있습니다.</p>
           </div>
         </Reveal>
       </section>
 
-      {/* 01 · PROBLEM -------------------------------------------- */}
-      <section className="sec" id="problem">
-        <div className="wrap">
-          <SectionHead
-            num="01"
-            label="Overview"
-            title={
-              <>
-                시간이 없는 아침,
-                <br />
-                기억나지 않는 저녁
-              </>
-            }
-            lead="출근을 준비하는 아침엔 시간이 없고, 저녁엔 오늘 내 피부가 어땠는지 기억나지 않습니다. 화장과 관리가 서로 따로 놀기 때문입니다."
-          />
-          <ol className="questions">
-            {QUESTIONS.map((q, k) => (
-              <Reveal as="li" key={q} delay={k * 100}>
-                <span className="questions__n">Q{k + 1}</span>
-                <span className="questions__q">{q}</span>
-                <span className="questions__t">{['아침 · 화장', '저녁 · 관리', '내일 · 변화'][k]}</span>
-              </Reveal>
-            ))}
-          </ol>
-        </div>
+      {/* 002 CONNECT ------------------------------------------------ */}
+      <Cover id="connect" n="002" en="Connect" tone="connect" title="From Morning to Night" ko="아침의 기록이 저녁으로 넘어간다" art={<span className="x-arc" />} />
+      <TextBlock label="Scenario · 13h later">
+        <p>아침에 쓴 제품, 보정한 부위, 쿠션 유지 시간이 저녁 피부 확인의 출발점이 됩니다. 왼쪽 기록을 누르면 저녁 화면의 어느 줄로 넘어가는지 표시됩니다.</p>
+      </TextBlock>
+      <section className="x-band x-band--connect">
+        <ConnectDemo />
       </section>
 
-      {/* 02 · RESEARCH ------------------------------------------- */}
-      <section className="sec sec--tint" id="research">
-        <div className="wrap">
-          <SectionHead
-            num="02"
-            label="Desk Research → Insight → Function"
-            title="숫자가 가리킨 두 개의 순간"
-            lead="출근 준비 시간의 부족과 밀림·양 조절의 어려움, 그리고 내게 맞는 관리에 대한 수요. 두 리서치에서 얻은 인사이트를 각각 기능으로 연결했습니다."
-          />
-          {RESEARCH.map((r) => (
-            <div className="research" key={r.tag}>
-              <Reveal className="research__head">
-                <span className={`pill pill--${r.tag.toLowerCase()}`}>{r.tag}</span>
-                <h3 className="h-sub">{r.title}</h3>
-              </Reveal>
-              <div className="stats">
-                {r.stats.map(([v, l, src], k) => (
-                  <Reveal className="stat" key={v} delay={k * 80}>
-                    <b className="stat__v">{v}</b>
-                    <span className="stat__l">{l}</span>
-                    <span className="stat__src">{src}</span>
-                  </Reveal>
-                ))}
-              </div>
-              <ul className="pairs">
-                {r.pairs.map(([ins, fn]) => (
-                  <Reveal as="li" key={ins}>
-                    <span className="pairs__k">Insight</span>
-                    <span className="pairs__ins">{ins}</span>
-                    <span className="pairs__arrow" aria-hidden="true">
-                      →
-                    </span>
-                    <span className="pairs__k">Function</span>
-                    <span className="pairs__fn">{fn}</span>
-                  </Reveal>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+      {/* 003 NIGHT -------------------------------------------------- */}
+      <Cover id="night" n="003" en="Night" tone="night" title="Check & Care" ko="부위별로 재고, 겹친 원으로 읽는다" art={<span className="x-rings"><i /><i /><i /></span>} />
+      <TextBlock label="Scenario · 21:40">
+        <p>원의 크기는 범위를, 겹침은 진행 정도를, 색은 고민의 종류를 뜻합니다. 스캔을 시작하면 부위별 측정이 자동으로 진행되고, 고민 부위를 누르면 오늘의 목표와 6분 관리 코스로 이어집니다.</p>
+      </TextBlock>
+      <section className="x-band x-band--night">
+        <FlowDemo steps={NIGHT_STEPS} label="저녁 피부 스캔 흐름" variant="cinema" />
+        <ul className="x-legend">
+          <li>
+            <span className="x-legend__dots" aria-hidden="true">
+              <i />
+              <i className="lg" />
+            </span>
+            <b>Size = Range</b>
+            <span>고민이 넓을수록 원이 커집니다</span>
+          </li>
+          <li>
+            <span className="x-legend__dots is-overlap" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+            <b>Overlap = Duration</b>
+            <span>오래 이어질수록 겹쳐 진해집니다</span>
+          </li>
+          <li>
+            <span className="x-legend__dots is-warm" aria-hidden="true">
+              <i />
+              <i className="blue" />
+            </span>
+            <b>Color = Concern</b>
+            <span>파랑은 수분, 주황은 유분</span>
+          </li>
+        </ul>
       </section>
 
-      {/* 03 · PERSONA -------------------------------------------- */}
-      <section className="sec" id="persona">
-        <div className="wrap">
-          <SectionHead
-            num="03"
-            label="Persona"
-            title="아침의 지우, 밤의 서진"
-            lead="출근 준비에 쫓기는 30대에게는 시간에 맞춘 음성 화장 가이드를, 퇴근 후 관리가 고민인 40대에게는 부위별 관리 안내와 변화 기록을 제공합니다."
-          />
-          <div className="personas">
-            {PERSONAS.map((p, k) => (
-              <Reveal className="persona" key={p.name} delay={k * 120}>
-                <Placeholder ratio="1 / 1" title={`${p.name} 프로필 사진`} spec="1:1 · 정면 인물 사진 · 페르소나 카드용" className="persona__ph" />
-                <div className="persona__body">
-                  <span className="persona__tag">{p.tag}</span>
-                  <h3 className="persona__name">
-                    {p.name} <small>{p.meta}</small>
-                  </h3>
-                  <p className="persona__quote">“{p.quote}”</p>
-                  <dl className="persona__dl">
-                    <dt>Pain point</dt>
-                    {p.pains.map((x) => (
-                      <dd key={x}>{x}</dd>
-                    ))}
-                    <dt>Needs</dt>
-                    {p.needs.map((x) => (
-                      <dd key={x}>{x}</dd>
-                    ))}
-                  </dl>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal as="p" className="target">
-            <b>TARGET</b> 바쁜 출근 전에는 시간에 맞춰 화장하고, 퇴근 후에는 피부 상태와 변화를 확인하며 자신에게 맞는 관리를 이어가고 싶은 30~40대 직장인 여성
-          </Reveal>
-        </div>
+      {/* 004 TOMORROW ----------------------------------------------- */}
+      <Cover id="tomorrow" n="004" en="Tomorrow" tone="tomorrow" title="Review & Routine" ko="쌓인 기록이 내일 아침을 바꾼다" art={<span className="x-bars">{[38, 46, 41, 55, 62, 70, 78].map((h, k) => <i key={k} style={{ height: `${h}%` }} />)}</span>} />
+      <TextBlock label="Review">
+        <p>기록이 쌓이면 내 피부가 실제로 어떻게 바뀌었는지 숫자로 보입니다. 아래 화면의 영역을 눌러 확대해 보세요.</p>
+      </TextBlock>
+      <section className="x-band x-band--tomorrow">
+        <ZoomView src="change.png" alt="변화 화면 · 피부 지수 7주 추이와 피부 나이" regions={CHANGE_REGIONS} />
+      </section>
+      <TextBlock label="Routine">
+        <p>변화 결과는 AI 제안이 되어 내일 아침 루틴에 반영됩니다. ‘추가’와 ‘저장’을 차례로 눌러, 다음 날 첫 화면이 어떻게 바뀌는지 확인해 보세요.</p>
+      </TextBlock>
+      <section className="x-band x-band--tomorrow">
+        <FlowDemo steps={ROUTINE_STEPS} label="루틴 조정 흐름" variant="cinema" />
       </section>
 
-      {/* 04 · CONCEPT -------------------------------------------- */}
-      <section className="sec sec--paper" id="concept">
-        <div className="wrap">
-          <SectionHead
-            num="04"
-            label="Design Concept · Tracing Paper"
-            title={
-              <>
-                필요한 곳을 짚어 주고,
-                <br />
-                하루를 겹쳐 쌓는다
-              </>
-            }
-            lead="트레이싱지처럼 필요한 위치와 정보, 관리 방법을 그 자리에 짚어 주고, 상황에 맞춰 기록을 누적·중첩해 전달합니다. “내 상황에 맞게, 따라 하기 쉽게, 내 피부에 맞게.”"
-          />
-          <div className="layers" aria-hidden="true">
-            <span className="layers__sheet layers__sheet--1">Morning record</span>
-            <span className="layers__sheet layers__sheet--2">Night scan</span>
-            <span className="layers__sheet layers__sheet--3">Tomorrow routine</span>
-          </div>
-          <div className="keywords">
-            {KEYWORDS.map(([en, ko, d], k) => (
-              <Reveal className="keyword" key={en} delay={k * 80}>
-                <span className="keyword__en">{en}</span>
-                <span className="keyword__ko">{ko}</span>
-                <span className="keyword__d">{d}</span>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal className="loop-head">
-            <h3 className="h-sub">Service Experience · 하루가 한 바퀴 도는 6단계</h3>
-            <span className="loop-head__note">단계를 누르면 해당 장면으로 이동합니다</span>
-          </Reveal>
-          <ol className="loop">
-            {LOOP.map((l) => (
-              <li key={l.n}>
-                <a href={`#${l.to}`} className={`loop__item loop__item--${l.t.toLowerCase()}`}>
-                  <span className="loop__t">
-                    {l.t} · {l.n}
-                  </span>
-                  <b>{l.en}</b>
-                  <span className="loop__ko">{l.ko}</span>
-                  <span className="loop__d">{l.d}</span>
-                </a>
-              </li>
-            ))}
-            <li className="loop__back" aria-label="다음 날 01로 돌아감">
-              ↺ 다음 날 01로
+      {/* SYNC ------------------------------------------------------- */}
+      <section className="x-voice" id="sync">
+        <Reveal className="x-voice__text">
+          <h2 className="x-voice__title">Mirror × Mobile</h2>
+          <p className="x-voice__type">거울은 안내하고, 폰은 이어 받는다</p>
+          <p className="x-voice__desc">화장품을 든 손으로는 거울을 만지기 어렵습니다. 거울은 얼굴 앞에서 안내와 측정을, 폰은 루틴 선택·리모컨·기록 수신을 맡습니다.</p>
+          <ol className="x-voice__list">
+            <li>
+              <span>01</span>루틴 선택 · 거울로 보내기
+            </li>
+            <li>
+              <span>02</span>진행 중 리모컨
+            </li>
+            <li>
+              <span>03</span>완료 기록 수신
             </li>
           </ol>
-        </div>
-      </section>
-
-      {/* 05 · SHOWING INDEX -------------------------------------- */}
-      <section className="sec sec--ink" id="flow">
-        <div className="wrap">
-          <SectionHead
-            num="05"
-            label="Design Showing"
-            title="하루를 따라가는 네 장면"
-            lead="화면을 기능별로 나열하지 않고, 한 사람의 하루를 따라 연결 → 준비 → 안내 → 변화 확인의 흐름으로 보여 줍니다. 각 장면에서 실제 버튼을 눌러 화면이 어떻게 바뀌는지 확인할 수 있습니다."
-          />
-          <div className="chapters">
-            {CHAPTERS.map((c, k) => (
-              <Reveal key={c.id} delay={k * 80}>
-                <a className="chapter-card" href={`#${c.id}`}>
-                  <span className="chapter-card__n">{c.n}</span>
-                  <b className="chapter-card__en">{c.en}</b>
-                  <span className="chapter-card__ko">{c.ko}</span>
-                  <span className="chapter-card__steps">{c.steps}</span>
-                  <span className="chapter-card__tags">
-                    {c.tags.map((t) => (
-                      <i key={t}>{t}</i>
-                    ))}
-                  </span>
-                </a>
-              </Reveal>
-            ))}
-          </div>
-          <p className="flow-foot">DAY → NIGHT → NEXT DAY ↺</p>
-        </div>
-      </section>
-
-      {/* 001 · MORNING ------------------------------------------- */}
-      <section className="sec sec--day" id="morning">
-        <div className="wrap">
-          <ChapterHead c={CHAPTERS[0]} title="출근 시간에 맞춰, 거울이 먼저 켜진다" message="시계를 보지 않아도 거울이 시간과 순서를 챙깁니다. 따라 하기만 하면 되고, 어디를 몇 번 보정했는지도 함께 기록됩니다." />
-          <FlowDemo steps={MORNING_STEPS} label="아침 메이크업 흐름" />
-          <div className="aux">
-            <Reveal className="aux__item">
-              <span className="aux__k">Timer</span>
-              <b>내 준비 시간에 맞춘 타이머</b>
-              <p>출근 시각을 기준으로 단계별 남은 시간을 보여 줘 따로 시계를 볼 필요가 없습니다.</p>
-            </Reveal>
-            <Reveal className="aux__item" delay={80}>
-              <span className="aux__k">Voice</span>
-              <b>5분 · 10분 전 음성 안내</b>
-              <p>화장이 끝나기 전에 음성으로 알려 시간 부족을 막습니다. 마이크 버튼으로 음성 명령도 가능합니다.</p>
-            </Reveal>
-            <Reveal className="aux__item" delay={160}>
-              <Placeholder ratio="16 / 10" title="점선 트레이싱 · 원형 스팟 가이드" spec="4:3 · 얼굴 위 도포 위치/양 가이드가 보이는 거울 화면 클로즈업" />
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* 002 · CONNECT ------------------------------------------- */}
-      <section className="sec" id="connect">
-        <div className="wrap">
-          <ChapterHead c={CHAPTERS[1]} title="아침의 기록이 저녁으로 넘어간다" message="아침에 쓴 제품, 보정한 부위, 쿠션 유지 시간이 저녁 피부 확인의 출발점이 됩니다. 화장과 관리를 하나로 잇는 연결고리입니다." />
-          <ConnectDemo />
-        </div>
-      </section>
-
-      {/* 003 · NIGHT --------------------------------------------- */}
-      <section className="sec sec--night" id="night">
-        <div className="wrap">
-          <ChapterHead c={CHAPTERS[2]} title="부위별로 재고, 겹친 원으로 읽는다" message="원의 크기는 범위를, 겹침은 진행 정도를 뜻합니다. 고민 부위를 누르면 오늘의 목표와 6분 관리 코스로 바로 이어집니다." />
-          <FlowDemo steps={NIGHT_STEPS} label="저녁 피부 스캔 흐름" />
-          <div className="legend">
-            <Reveal className="legend__item">
-              <span className="legend__dots" aria-hidden="true">
-                <i />
-                <i className="lg" />
-              </span>
-              <b>원 크기 = 범위</b>
-              <p>고민이 넓게 퍼질수록 원이 커집니다.</p>
-            </Reveal>
-            <Reveal className="legend__item" delay={80}>
-              <span className="legend__dots legend__dots--overlap" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              <b>겹칠수록 진행</b>
-              <p>같은 고민이 오래 이어질수록 원이 겹쳐 진해집니다. (트레이싱 레이어)</p>
-            </Reveal>
-            <Reveal className="legend__item" delay={160}>
-              <span className="legend__dots legend__dots--warm" aria-hidden="true">
-                <i />
-              </span>
-              <b>색 = 고민 종류</b>
-              <p>파랑은 수분(건조), 주황은 유분(T존)처럼 고민 종류를 색으로 구분합니다.</p>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* 004 · TOMORROW ------------------------------------------ */}
-      <section className="sec" id="tomorrow">
-        <div className="wrap">
-          <ChapterHead c={CHAPTERS[3]} title="쌓인 기록이 내일 아침을 바꾼다" message="기록이 쌓이면 내 피부가 실제로 어떻게 바뀌었는지 숫자로 보이고, 그 결과가 내일 아침 루틴에 반영됩니다." />
-          <h4 className="h-mini">06 Review · 변화 확인 — 영역을 눌러 확대</h4>
-          <ZoomView src="change.png" alt="변화 화면 · 피부 지수 7주 추이와 피부 나이" regions={CHANGE_REGIONS} />
-          <h4 className="h-mini h-mini--gap">Routine · AI 제안을 내일 루틴에 반영</h4>
-          <FlowDemo steps={ROUTINE_STEPS} label="루틴 조정 흐름" />
-        </div>
-      </section>
-
-      {/* 06 · SYNC ----------------------------------------------- */}
-      <section className="sec sec--tint" id="sync">
-        <div className="wrap">
-          <SectionHead
-            num="06"
-            label="Mirror × Mobile"
-            title="거울은 안내하고, 폰은 이어 받는다"
-            lead="화장하는 동안 손에 화장품을 든 사용자는 거울을 직접 만지기 어렵습니다. 그래서 거울은 얼굴 앞에서 안내와 측정을, 폰은 루틴 선택·리모컨·기록 수신을 맡습니다. 오른쪽 폰 화면을 직접 눌러 보세요."
-          />
-          <div className="roles">
-            <Reveal className="role">
-              <span className="role__k">Mirror · 얼굴 앞에서</span>
-              <ul>
-                <li>지금 할 행동 한 줄과 바를 위치 안내</li>
-                <li>부위별 피부 스캔과 겹친 원 결과</li>
-                <li>메이크업 결과 체크 · 보정 부위 표시</li>
-              </ul>
-            </Reveal>
-            <Reveal className="role" delay={80}>
-              <span className="role__k">Mobile · 거울 밖에서</span>
-              <ul>
-                <li>시작할 루틴 선택 · 거울로 보내기</li>
-                <li>진행 중 리모컨 (이전 · 일시정지 · 다음 · +1분)</li>
-                <li>완료 기록 수신 · 제품 등록 · 설정</li>
-              </ul>
-            </Reveal>
-          </div>
+          <span className="x-voice__bar" aria-hidden="true">
+            <i style={{ flex: 6, background: '#3e8ede' }} />
+            <i style={{ flex: 1.4, background: '#222' }} />
+            <i style={{ flex: 1.2, background: '#f4f4f4' }} />
+            <i style={{ flex: 1, background: '#e4f0fb' }} />
+          </span>
+        </Reveal>
+        <div className="x-voice__demo">
           <SyncDemo />
-          <p className="note-req">추가 자료 필요 · 거울과 앱의 첫 연결(페어링) 과정과 연결이 끊겼을 때의 화면은 기획서·UI에 없어 이번 쇼잉에서는 다루지 않았습니다.</p>
+          <p className="note-req">추가 자료 필요 · 거울과 앱의 첫 연결(페어링), 연결이 끊겼을 때의 화면은 기획서·UI에 없어 다루지 않았습니다.</p>
         </div>
       </section>
 
-      {/* 07 · DESIGN SYSTEM -------------------------------------- */}
-      <section className="sec" id="system">
-        <div className="wrap">
-          <SectionHead
-            num="07"
-            label="Design System · 피드백 반영"
-            title="얼굴을 가리지 않는 정보"
-            lead="3가지 주요 피드백을 바탕으로 미러 디스플레이의 구조와 가독성, 정보 위계를 개선했습니다. 거울 위에는 꼭 필요한 한 줄만 남기고, 나머지는 얼굴 밖 패널로 옮겼습니다."
-          />
-          <div className="feedback">
-            {FEEDBACK.map(([t, items], k) => (
-              <Reveal className="feedback__item" key={t} delay={k * 80}>
-                <span className="feedback__n">0{k + 1}</span>
-                <b>{t}</b>
-                <ul>
-                  {items.map((x) => (
-                    <li key={x}>{x}</li>
-                  ))}
-                </ul>
-              </Reveal>
+      {/* DESIGN SYSTEM ---------------------------------------------- */}
+      <TextBlock id="system" label="Design Summary · Feedback">
+        <p>3가지 주요 피드백을 바탕으로 미러 디스플레이의 구조와 가독성, 정보 위계를 개선했습니다. 거울 위에는 꼭 필요한 한 줄만 남기고, 나머지는 얼굴 밖 패널로 옮겼습니다.</p>
+      </TextBlock>
+
+      <section className="x-summary">
+        <Reveal className="x-summary__banner">
+          <span className="x-collage__n">01</span>
+          <div className="x-summary__banner-in">
+            <span>Clear</span>
+            <TraceFace spots={false} className="trace--mini" />
+            <span>Guided</span>
+          </div>
+        </Reveal>
+        <Reveal className="x-summary__type" delay={100}>
+          <span className="x-collage__n">02</span>
+          <div className="x-spec">
+            <div className="x-spec__head">
+              <span>Noto Sans KR</span>
+              <span>
+                KR <i>EN</i>
+              </span>
+            </div>
+            <b className="x-spec__big">가Aa</b>
+          </div>
+          <ol className="x-summary__list">
+            {FEEDBACK.map(([en, ko], k) => (
+              <li key={en}>
+                <span>0{k + 1}</span>
+                {en} · {ko}
+              </li>
             ))}
-          </div>
-
-          <div className="ds">
-            <Reveal className="ds__block">
-              <h4 className="h-mini">Color · 강조는 한 색만</h4>
-              <ul className="swatches">
-                {COLORS.map(([hex, name, use]) => (
-                  <li key={hex}>
-                    <span className="swatch" style={{ background: hex }} />
-                    <b>{name}</b>
-                    <code>{hex}</code>
-                    <span>{use}</span>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-            <Reveal className="ds__block" delay={80}>
-              <h4 className="h-mini">Type · Noto Sans KR</h4>
-              <ul className="typescale">
-                {TYPE.map(([size, w, use, sample]) => (
-                  <li key={size}>
-                    <span className="typescale__meta">
-                      {size}px · {w}
-                      <br />
-                      {use}
-                    </span>
-                    <span className="typescale__sample" style={{ fontSize: `${Math.min(+size, 44)}px`, fontWeight: +w }}>
-                      {sample}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
-          </div>
-
-          <Reveal className="menu">
-            <h4 className="h-mini">Key Menu</h4>
-            <ul>
-              {MENU.map(([icon, name, d]) => (
-                <li key={name}>
-                  <span className="menu__icon">
-                    <Icon name={icon} size={22} />
-                  </span>
-                  <b>{name}</b>
-                  <span>{d}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </div>
+          </ol>
+        </Reveal>
       </section>
 
-      {/* 08 · SCREENS -------------------------------------------- */}
-      <section className="sec sec--tint" id="screens">
-        <div className="wrap">
-          <SectionHead num="08" label="Screens" title="한 화면씩, 하루의 순서대로" lead="미러 최종 화면 8장과 연동 앱 화면 8장입니다. 앱 화면은 실제로 눌러 볼 수 있는 프로토타입입니다." />
-        </div>
+      <ul className="x-feedback">
+        {FEEDBACK.map(([en, ko, d], k) => (
+          <Reveal as="li" key={en} delay={k * 80}>
+            <span className="x-feedback__n">0{k + 1}</span>
+            <b>{en}</b>
+            <span className="x-feedback__ko">{ko}</span>
+            <p>{d}</p>
+          </Reveal>
+        ))}
+      </ul>
+
+      <TextBlock label="Color System">
+        <p>강조는 한 색만 씁니다. Trace Blue는 선택·알림·오늘의 데이터에만, 나머지 정보는 Ink의 명도 차이로 위계를 만듭니다. 거울에 비친 얼굴을 가리지 않도록 밝은 반투명 카드 위에 올립니다.</p>
+      </TextBlock>
+      <section className="x-colors">
+        {COLORS.map((c) => (
+          <Reveal className={`x-color x-color--${c.size}`} key={c.hex}>
+            <span className="x-color__role">{c.role}</span>
+            <span className="x-color__chip" style={{ background: c.hex }} />
+            <b>{c.name}</b>
+            <code>HEX {c.hex}</code>
+            <span className="x-color__use">{c.use}</span>
+          </Reveal>
+        ))}
+      </section>
+
+      <TextBlock label="Typography & Key Menu">
+        <p>거울에서 1m 떨어져서도 읽히도록 본문은 17px 이상, 대표 수치는 44px Light로 크게 둡니다. 메뉴는 다섯 개로 줄여 오른쪽 세로 레일에 고정했습니다.</p>
+      </TextBlock>
+      <section className="x-type">
+        <ul className="x-type__scale">
+          {TYPE.map(([size, w, use, sample]) => (
+            <Reveal as="li" key={size}>
+              <span className="x-type__meta">
+                {size}px / {w}
+                <i>{use}</i>
+              </span>
+              <span className="x-type__sample" style={{ fontSize: `clamp(${Math.max(13, size * 0.6)}px, ${size / 12}vw, ${size * 1.6}px)`, fontWeight: +w }}>
+                {sample}
+              </span>
+            </Reveal>
+          ))}
+        </ul>
+        <ul className="x-menu">
+          {MENU.map(([icon, en, ko]) => (
+            <li key={en}>
+              <span className="x-menu__icon">
+                <Icon name={icon} size={24} />
+              </span>
+              <b>{en}</b>
+              <span>{ko}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* SCREENS ---------------------------------------------------- */}
+      <section className="x-screens" id="screens">
+        <Reveal className="x-screens__head">
+          <span className="x-state__label">Screens</span>
+          <p className="x-screens__title">Mirror 8 · App 8</p>
+          <p className="x-state__ko">하루의 순서대로. 앱 화면은 실제로 눌러 볼 수 있습니다.</p>
+        </Reveal>
         <div className="strip" tabIndex={0} aria-label="미러 화면 목록 · 가로 스크롤">
           {MIRROR_STRIP.map(([src, label]) => (
             <figure key={src} className="strip__item">
@@ -801,42 +867,58 @@ export default function Showing() {
             </figure>
           ))}
         </div>
-        <div className="wrap">
-          <a className="btn-solid btn-solid--lg" href="#/screens">
-            전체 인터랙티브 프로토타입 보기 (22개 화면) <Icon name="arrowUpRight" size={18} />
-          </a>
-        </div>
+        <a className="x-screens__cta" href="#/screens">
+          Full Prototype · 22 screens <Icon name="arrowUpRight" size={18} />
+        </a>
       </section>
 
-      {/* CLOSING ------------------------------------------------- */}
-      <section className="closing">
-        <div className="wrap">
-          <Reveal>
-            <p className="kicker">
-              <span className="kicker__num">∞</span>Closing
-            </p>
-            <h2 className="closing__title">
-              아침의 기록이 저녁 관리로,
-              <br />
-              저녁의 결과가 내일 아침으로.
-            </h2>
-            <p className="closing__sub">매일 이어지는 거울, Trac:ing</p>
-          </Reveal>
-          <div className="cycle" aria-label="DAY에서 NIGHT, 다음 날로 이어지는 순환">
-            {['DAY · 기록', 'NIGHT · 확인', 'NEXT DAY · 반영'].map((x, k) => (
-              <Reveal key={x} className="cycle__node" delay={k * 120}>
-                {x}
-              </Reveal>
-            ))}
-          </div>
-          <Placeholder ratio="21 / 9" title="실제 사용 장면 영상 · 사진" spec="21:9 · 출근 전 탁상 위 미러 앞에서 화장하는 모습 → 밤에 피부를 확인하는 모습 (마무리 영상, 10~15초)" className="closing__ph" />
-          <footer className="foot">
-            <img src={`${import.meta.env.BASE_URL}logo-tracing.png`} alt="Trac:ing" width="92" height="25" />
-            <span>Interaction Design · 22565053 조윤정 · 김승언 교수님 · 2026</span>
-            <a href="#top">맨 위로 ↑</a>
-          </footer>
-        </div>
+      {/* ENDING ----------------------------------------------------- */}
+      <section className="x-end">
+        <div className="x-hero__sky x-hero__sky--dusk" aria-hidden="true" />
+        <Reveal className="x-end__in">
+          <p className="x-end__title">See You Tomorrow Morning.</p>
+          <p className="x-hero__ko">아침의 기록이 저녁 관리로, 저녁의 결과가 내일 아침으로.</p>
+        </Reveal>
       </section>
+
+      <section className="x-film">
+        <Placeholder ratio="21 / 9" title="Usage Film · 실제 사용 장면" spec="21:9 · 출근 전 탁상 미러 앞 화장 → 밤 피부 확인 (10~15초 영상 또는 사진)" />
+      </section>
+
+      <footer className="x-credit">
+        <p className="x-credit__logo">
+          Trac<span>:</span>ing
+        </p>
+        <dl className="x-credit__grid">
+          <div>
+            <dt>Project</dt>
+            <dd>Trac:ing — Desk Beauty Mirror &amp; App</dd>
+          </div>
+          <div>
+            <dt>Course</dt>
+            <dd>Interaction Design, 2026</dd>
+          </div>
+          <div>
+            <dt>Designer</dt>
+            <dd>22565053 조윤정</dd>
+          </div>
+          <div>
+            <dt>Professor</dt>
+            <dd>김승언 교수님</dd>
+          </div>
+          <div>
+            <dt>Scope</dt>
+            <dd>Research · UX · UI · Prototype</dd>
+          </div>
+          <div>
+            <dt>Date</dt>
+            <dd>2026.11.17</dd>
+          </div>
+        </dl>
+        <a className="x-credit__top" href="#top">
+          Back to top ↑
+        </a>
+      </footer>
     </div>
   );
 }

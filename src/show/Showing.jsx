@@ -72,11 +72,11 @@ const KEYWORDS = [
 ];
 
 const COLORS = [
-  { hex: '#3E8EDE', name: 'Trace Blue', role: 'Primary', use: '선택 · 알림 · 오늘의 데이터', size: 'xl' },
-  { hex: '#222222', name: 'Ink', role: 'Primary', use: '본문 · 큰 수치', size: 'lg' },
-  { hex: '#F4F4F4', name: 'Surface', role: 'System', use: '카드 · 트랙', size: 'sm' },
-  { hex: '#8A8A8A', name: 'Ink 3', role: 'System', use: '보조 라벨', size: 'sm' },
-  { hex: '#E4F0FB', name: 'Accent Soft', role: 'Point', use: '선택 배경', size: 'sm' },
+  { hex: '#3E8EDE', name: 'Trace Blue', role: '01 Primary', use: '선택 · 알림 · 오늘의 데이터', size: 'xl' },
+  { hex: '#222222', name: 'Ink', role: '02 Primary', use: '본문 · 큰 수치', size: 'lg' },
+  { hex: '#F4F4F4', name: 'Surface', role: '03 System', use: '카드 · 트랙', size: 'sm' },
+  { hex: '#8A8A8A', name: 'Ink 3', role: '04 System', use: '보조 라벨', size: 'sm' },
+  { hex: '#E4F0FB', name: 'Accent Soft', role: '05 Point', use: '선택 배경', size: 'sm' },
 ];
 
 const LOOP = [
@@ -449,79 +449,82 @@ const HERO_MODES = [
 
 function HeroCover() {
   const [m, setM] = useState(0);
+  const mode = HERO_MODES[m];
+  return (
+    <section className={`x-hero is-${mode.key}`}>
+      <div className="x-hero__sky" aria-hidden="true" />
+      <div className="x-hero__sky x-hero__sky--night" aria-hidden="true" />
+      <TraceFace spots={false} className="trace--hero" />
+      <div className="x-hero__in">
+        <p className="x-hero__kicker">Trac:ing — Desk Beauty Mirror &amp; App</p>
+        <h1 className="x-hero__title">
+          The Mirror That
+          <br />
+          Remembers Your Day
+        </h1>
+        <p className="x-hero__ko">하루를 이어서 기억하는 거울</p>
+        <div className="x-hero__modes" role="tablist" aria-label="아침 / 저녁">
+          {HERO_MODES.map((x, k) => (
+            <button key={x.key} type="button" role="tab" aria-selected={k === m} className={k === m ? 'is-on' : ''} onClick={() => setM(k)}>
+              <b>{x.time}</b> {x.en}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="x-hero__foot">
+        <span>We trace your morning, care for your night, and carry it into tomorrow.</span>
+        <span>Interaction Design 2026 · 22565053 조윤정 · 김승언 교수님</span>
+      </p>
+    </section>
+  );
+}
+
+/** Full-bleed product shot (UNIX “video-wrap” slot): the mirror on a desk, Morning ↔ Night by tapping. */
+function ProductShot() {
+  const [m, setM] = useState(0);
   const [auto, setAuto] = useState(true);
   useEffect(() => {
     if (!auto || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
     const t = setInterval(() => setM((x) => 1 - x), 4200);
     return () => clearInterval(t);
   }, [auto]);
-  useEffect(() => {
-    document.documentElement.dataset.hero = HERO_MODES[m].key;
-    return () => delete document.documentElement.dataset.hero;
-  }, [m]);
   const mode = HERO_MODES[m];
   return (
-    <section className={`x-cov is-${mode.key}`}>
-      <div className="x-cov__text">
-        <p className="x-cov__kicker">Desk Beauty Mirror &amp; App — Interaction Design 2026</p>
-        <h1 className="x-cov__mark">
-          Trac<span>:</span>ing
-        </h1>
-        <p className="x-cov__tag">하루를 이어서 기억하는 거울</p>
-        <p className="x-cov__en">The mirror that remembers your day.</p>
-        <div className="x-cov__modes" role="tablist" aria-label="아침 / 저녁 화면 전환">
-          {HERO_MODES.map((x, k) => (
-            <button
-              key={x.key}
-              type="button"
-              role="tab"
-              aria-selected={k === m}
-              className={`x-cov__mode ${k === m ? 'is-on' : ''}`}
-              onClick={() => {
-                setAuto(false);
-                setM(k);
-              }}
-            >
-              <b>{x.time}</b>
-              <span>
-                {x.en} · {x.ko}
-              </span>
-              {k === m && auto && <i className="x-cov__timer" aria-hidden="true" />}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="x-cov__visual">
+    <section className={`x-shot is-${mode.key}`}>
+      <Reveal className="x-shot__in">
         <div className="desk">
           <div className="desk__mirror">
             <div className="desk__screen">
               {HERO_MODES.map((x, k) => (
-                <img key={x.key} src={asset(x.img)} alt={k === m ? x.alt : ''} className={k === m ? 'is-on' : ''} decoding="async" />
+                <img key={x.key} src={asset(x.img)} alt={k === m ? x.alt : ''} className={k === m ? 'is-on' : ''} loading="lazy" decoding="async" />
               ))}
             </div>
           </div>
           <span className="desk__neck" aria-hidden="true" />
           <span className="desk__base" aria-hidden="true" />
         </div>
+      </Reveal>
+      <div className="x-shot__modes" role="tablist" aria-label="아침 / 저녁 화면 전환">
+        {HERO_MODES.map((x, k) => (
+          <button
+            key={x.key}
+            type="button"
+            role="tab"
+            aria-selected={k === m}
+            className={k === m ? 'is-on' : ''}
+            onClick={() => {
+              setAuto(false);
+              setM(k);
+            }}
+          >
+            <b>{x.time}</b>
+            <span>
+              {x.en} · {x.ko}
+            </span>
+            {k === m && auto && <i className="x-cov__timer" aria-hidden="true" />}
+          </button>
+        ))}
       </div>
-      <dl className="x-cov__meta">
-        <div>
-          <dt>Designer</dt>
-          <dd>22565053 조윤정</dd>
-        </div>
-        <div>
-          <dt>Professor</dt>
-          <dd>김승언 교수님</dd>
-        </div>
-        <div>
-          <dt>Scope</dt>
-          <dd>BX · UX · UI · Prototype</dd>
-        </div>
-        <div>
-          <dt>Date</dt>
-          <dd>2026.11.17</dd>
-        </div>
-      </dl>
     </section>
   );
 }
@@ -578,6 +581,8 @@ export default function Showing() {
           ))}
         </Reveal>
       </Chapter>
+
+      <ProductShot />
 
       <Sub label="Screen Anatomy · HOME">아침 08:10의 홈 화면입니다. 번호를 누르거나 목록 위에 올리면 해당 영역이 강조됩니다.</Sub>
       <section className="x-band x-band--plain">
@@ -705,16 +710,19 @@ export default function Showing() {
         <Sub label="Visual Identity">워드마크와 두 가지 그래픽 모티프. 점선은 ‘짚어 주는 안내’를, 겹친 원은 ‘쌓이는 기록’을 뜻하며 실제 UI에서도 같은 의미로 쓰입니다.</Sub>
         <div className="x-id">
           <Reveal className="x-id__mark">
+            <span className="x-num">01</span>
             <p>
               Trac<span>:</span>ing
             </p>
             <i>Wordmark</i>
           </Reveal>
           <Reveal className="x-id__motif" delay={80}>
+            <span className="x-num">02</span>
             <TraceFace className="trace--motif" />
             <i>Motif 01 · Dotted Trace — 위치 안내</i>
           </Reveal>
           <Reveal className="x-id__motif x-id__motif--rings" delay={160}>
+            <span className="x-num">03</span>
             <span className="x-rings x-rings--small">
               <i />
               <i />
@@ -728,8 +736,8 @@ export default function Showing() {
         <div className="x-colors">
           {COLORS.map((c) => (
             <Reveal className={`x-color x-color--${c.size}`} key={c.hex}>
-              <span className="x-color__chip" style={{ background: c.hex }} />
               <span className="x-color__role">{c.role}</span>
+              <span className="x-color__chip" style={{ background: c.hex }} />
               <b>{c.name}</b>
               <code>{c.hex}</code>
               <span className="x-color__use">{c.use}</span>

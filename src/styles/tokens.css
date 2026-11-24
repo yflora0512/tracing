@@ -1,0 +1,46 @@
+/* Trac:ing design system — from the "ds" artboard (컬러 · 타이포 · 간격 · 모서리) */
+:root {
+  /* 01 컬러 */
+  --accent: #3e8ede;              /* 강조는 이 색 하나만 · 선택, 알림, 오늘 데이터 */
+  --accent-tint: rgba(62, 142, 222, 0.12); /* 네비 선택 배경, 적정 범위 */
+  --accent-soft: #e4f0fb;
+  --ink: #222222;                 /* 본문, 큰 수치 */
+  --ink-2: #666666;               /* 카드 라벨 */
+  --ink-3: #8a8a8a;               /* 보조 라벨, 음성 버튼 */
+  --ink-4: #aaaaaa;
+  --ink-soft: #444444;
+  --surface: #ffffff;
+  --surface-2: #f4f4f4;           /* 카드, 트랙, 칩 배경 */
+  --chip: #f0f0f0;
+  --line: #eeeeee;
+  --line-2: #dddddd;
+  --placeholder: #bdbdbd;
+  --track: rgba(0, 0, 0, 0.06);
+
+  /* 02 타이포 */
+  --font: 'Noto Sans KR', 'Pretendard', system-ui, sans-serif;
+  --fs-display: 44px;   /* 300 · 대표 수치 */
+  --fs-headline: 30px;  /* 500 · 카드 헤드라인 */
+  --fs-number: 30px;    /* 300 · 카드 안 큰 수치 */
+  --fs-title: 22px;     /* 500 · 인사말, 화면 제목 */
+  --fs-body: 17px;      /* 400 · 안내 문구, 리스트 */
+  --fs-label: 15px;     /* 400 · 카드 라벨 */
+  --fs-caption: 13px;   /* 400 · 보조 설명 */
+
+  /* 03 모서리 */
+  --r-tooltip: 10px;
+  --r-chip: 16px;
+  --r-card: 22px;
+  --r-card-lg: 28px;
+  --r-mirror: 32px;
+  --r-full: 999px;
+
+  /* 05 글라스 */
+  --glass-bg: rgba(255, 255, 255, 0.42);
+  --glass-filter: blur(24px) saturate(1.4);
+  --glass-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), 0 8px 28px rgba(0, 0, 0, 0.06);
+
+  /* 모바일 A7 글라스 */
+  --m-glass-bg: rgba(255, 255, 255, 0.72);
+  --m-glass-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.04);
+}

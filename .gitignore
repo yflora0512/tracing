@@ -1,0 +1,21 @@
+# dependencies & build output
+node_modules
+dist
+
+# OS / editor
+.DS_Store
+.vscode
+.idea
+
+# local Claude Code settings
+.claude/settings.local.json
+
+# secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials*.json
+*.token
+.token

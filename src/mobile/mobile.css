@@ -1,0 +1,325 @@
+/* Mobile app · A7 (390 × 844, 좌우 20 · 카드 간격 12 · 카드 패딩 20 · 모서리 24) */
+.phone {
+  width: 390px;
+  height: 844px;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border-radius: var(--r-card-lg);
+  box-shadow: 0 0 0 1px #e2e2e2;
+  color: var(--ink);
+  letter-spacing: -0.2px;
+}
+.phone__scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding-bottom: 108px;
+  scrollbar-width: none;
+}
+.phone__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Device variant (설정 · 제품 등록: 흰 베젤 + 그라데이션) */
+.device {
+  width: 390px;
+  height: 800px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 48px;
+  border: 6px solid #fff;
+  background: linear-gradient(170deg, #f5f5f5, #e4e4e4);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  padding: 0 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--ink);
+}
+.device__status {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 6px 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+.device__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 22px;
+}
+.device__back {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.device__section {
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 4px 6px 0;
+}
+
+/* Header */
+.m-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 20px 0;
+}
+.m-top--tall {
+  padding-top: 32px;
+}
+.m-top__title {
+  font-size: 24px;
+  font-weight: 700;
+}
+.m-top__center {
+  font-size: 17px;
+  font-weight: 600;
+}
+.m-top__actions {
+  display: flex;
+  gap: 8px;
+}
+.m-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--m-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--m-glass-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  flex-shrink: 0;
+}
+.m-icon-btn--bare {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Cards */
+.m-card {
+  margin: 12px 20px 0;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--m-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--m-glass-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.m-card--accent {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: none;
+}
+.m-card--list {
+  gap: 0;
+}
+.m-card--pill {
+  border-radius: var(--r-full);
+  padding: 14px 16px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.m-glass {
+  background: var(--m-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--m-glass-shadow);
+}
+
+.m-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 24px 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.m-section__meta {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+/* Filter chips */
+.m-filters {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px 0;
+}
+.m-filter {
+  padding: 9px 16px;
+  border-radius: var(--r-full);
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.m-filter[aria-pressed='true'] {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.m-filter[aria-pressed='false'] {
+  background: var(--m-glass-bg);
+  box-shadow: var(--m-glass-shadow);
+}
+
+/* List rows */
+.m-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: left;
+  width: 100%;
+}
+.m-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.m-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.m-row__title {
+  font-size: 15px;
+  font-weight: 500;
+}
+.m-row__sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.m-row__value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Stat tiles (148px) */
+.m-tiles {
+  display: flex;
+  gap: 12px;
+  padding: 12px 20px 0;
+}
+.m-tile {
+  flex: 1;
+  height: 148px;
+  padding: 20px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.m-tile--accent {
+  background: var(--accent);
+  color: #fff;
+}
+.m-tile__head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+}
+.m-tile__value {
+  font-size: 32px;
+  font-weight: 300;
+  margin-top: 4px;
+}
+.m-tile__foot {
+  margin-top: auto;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.m-tile--accent .m-tile__foot {
+  color: #fff;
+  opacity: 0.9;
+}
+
+.m-badge {
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Floating tab bar */
+.m-tabbar {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  height: 68px;
+  border-radius: var(--r-full);
+  background: var(--m-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--m-glass-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+.m-tab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2);
+}
+.m-tab[aria-current='page'] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.m-bottom {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 28px;
+}
+
+/* Radio check */
+.m-radio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 1.5px #cfd5db;
+  color: #fff;
+  flex-shrink: 0;
+}
+.m-radio--on {
+  background: var(--accent);
+  box-shadow: none;
+}
+.m-radio--current {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+.m-radio--sm {
+  width: 22px;
+  height: 22px;
+}

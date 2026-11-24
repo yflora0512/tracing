@@ -70,6 +70,7 @@ export function SkinChange() {
         <AiTag />
       </div>
       <div className="skin__data" aria-live="polite">
+        <p className="skin__challenge">[ 14 Days Challenge ]</p>
         <p className="skin__day">{d.day}</p>
         <p className="skin__num">
           <b>{d.moist}</b>
@@ -102,6 +103,17 @@ export function SkinChange() {
           <span>Day 7</span>
           <span>Day 14</span>
         </div>
+        <ul className="skin__result">
+          <li>
+            <b>+26</b> 볼 수분 32 → 58
+          </li>
+          <li>
+            <b>3 → 1</b> 건조 단계
+          </li>
+          <li>
+            <b>57</b> 주간 평균 돌파 (Day 14)
+          </li>
+        </ul>
         <p className="note-req">콘셉트 수치 · 실제 사용자 측정 데이터와 촬영 사진으로 교체 필요</p>
       </div>
     </div>

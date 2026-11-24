@@ -4,6 +4,7 @@ import Annotated from './Annotated.jsx';
 import FlowDemo from './FlowDemo.jsx';
 import VideoSlot from './VideoSlot.jsx';
 import { AiTag, PhotoSplit, SkinChange } from './Photo.jsx';
+import { FeatureSlides, HowToUse, SpecFaq } from './Explain.jsx';
 import LiveScreen from './LiveScreen.jsx';
 import SyncDemo from './SyncDemo.jsx';
 import ZoomView from './ZoomView.jsx';
@@ -30,8 +31,10 @@ const CHAPTERS = [
   ['flow', '06', 'Experience Flow'],
   ['features', '07', 'Key Features'],
   ['sync', '08', 'Mirror × Mobile'],
-  ['guide', '09', 'UI Guideline'],
-  ['screens', '10', 'Screens'],
+  ['use', '09', 'How to Use'],
+  ['guide', '10', 'UI Guideline'],
+  ['spec', '11', 'Spec & FAQ'],
+  ['screens', '12', 'Screens'],
 ];
 
 /* ---------------- content (기획서 · 실제 UI 근거) ---------------- */
@@ -115,6 +118,13 @@ const SCAN_PINS = [
   { l: 63, t: 39.6, w: 26.5, h: 11, k: 'Connect', title: '아침 기록과 연결', d: '“세미 매트 쿠션 13시간 유지.” 아침 기록을 건조의 원인 후보로 연결해 보여 줍니다.' },
   { l: 63, t: 52.2, w: 26.5, h: 36, k: 'Care', title: '추천 관리 순서', d: '화장품 / 디바이스 함께 중 선택. 클렌징 → 토너 → 수분 앰플 → 수분 크림, 4단계 6분.' },
   { l: 63, t: 89, w: 26.5, h: 6.8, k: 'Action', title: '기록만 저장 / 관리 시작', d: '바로 관리를 시작하거나, 기록만 남기고 다음 날 변화 확인으로 넘길 수 있습니다.' },
+];
+
+const PRODUCT_PINS = [
+  { l: 28, t: 11, w: 45, h: 41, k: 'Display Mirror', title: '거울이 되는 디스플레이', d: '평소에는 거울, 켜지면 1440 × 817 화면. 약 1m 거리에서 읽히도록 글자 크기와 대비를 정했습니다.' },
+  { l: 68, t: 10, w: 6, h: 38, k: 'Light Frame', title: '테두리 조명', d: '얼굴을 고르게 비추는 프레임 조명. 아침 메이크업과 저녁 스캔의 밝기 조건을 맞추는 역할입니다. (조명 사양 — 추가 자료 필요)' },
+  { l: 47.5, t: 51, w: 5, h: 20, k: 'Neck', title: '얼굴 높이에 맞춘 목', d: '앉은 자세에서 화면 중심이 얼굴 높이에 오도록 세운 지지대. (높이 · 각도 조절 사양 — 추가 자료 필요)' },
+  { l: 33, t: 63, w: 33, h: 17, k: 'Base', title: '탁상형 원형 받침', d: '화장대나 책상 위 어디에나 두는 탁상형. 벽 설치 없이 매일 같은 자리, 같은 거리에서 기록할 수 있습니다.' },
 ];
 
 const MORNING_STEPS = [
@@ -600,15 +610,10 @@ export default function Showing() {
         </Reveal>
       </Chapter>
 
-      <PhotoSplit
-        src="photo/product.jpg"
-        alt="탁상형 뷰티 미러 제품 이미지"
-        ratio="4 / 3"
-        label="Product"
-        title="책상 위에 두는, 1m 거리의 거울"
-        body="화장대나 책상 위에 올려 두는 탁상형 디스플레이 미러입니다. 거울 앞 약 1m에서 읽히는 화면, 손이 바쁠 때를 위한 음성 안내, 폰 앱과의 연동을 기본으로 설계했습니다."
-        keys={['#탁상형', '#디스플레이 1440×817', '#음성 안내', '#앱 연동']}
-      />
+      <Sub label="Product · 책상 위에 두는, 1m 거리의 거울">탁상형 디스플레이 미러입니다. 번호를 눌러 부위별 역할을 확인해 보세요.</Sub>
+      <section className="x-band x-band--plain">
+        <Annotated src="photo/product.jpg" alt="탁상형 뷰티 미러 제품 이미지 (AI 콘셉트)" label="제품 구성" pins={PRODUCT_PINS} ratio="1600 / 1200" aiTag />
+      </section>
       <ProductShot />
 
       <Sub label="Screen Anatomy · HOME">아침 08:10의 홈 화면입니다. 번호를 누르거나 목록 위에 올리면 해당 영역이 강조됩니다.</Sub>
@@ -807,7 +812,9 @@ export default function Showing() {
       </Chapter>
 
       {/* 07 KEY FEATURES (UI) -------------------------------------- */}
-      <Chapter id="features" title="네 장면으로 보는 하루" lead="각 장면은 사용 전 → 조작 → 화면 변화 → 결과 순서로 구성했습니다. 화면 위 파란 테두리(TAP)를 누르면 실제 버튼처럼 다음 화면으로 넘어갑니다." />
+      <Chapter id="features" title="네 장면으로 보는 하루" lead="각 장면은 사용 전 → 조작 → 화면 변화 → 결과 순서로 구성했습니다. 화면 위 파란 테두리(TAP)를 누르면 실제 버튼처럼 다음 화면으로 넘어갑니다.">
+        <FeatureSlides />
+      </Chapter>
 
       <Cover id="morning" n="1" en="Morning" tone="morning" title="Fit Time & Follow" ko="출근 시간에 맞춰, 거울이 먼저 켜진다" photo="photo/morning.jpg" photoAlt="거울을 보며 광대 위쪽에 블러셔를 두드리는 사용자" />
       <Sub label="08:10 · 시계를 보지 않아도 되는 아침">거울이 시간과 순서를 챙기고, 사용자는 따라 하기만 합니다. 어디를 몇 번 보정했는지도 함께 기록됩니다.</Sub>
@@ -950,7 +957,12 @@ export default function Showing() {
         </div>
       </Chapter>
 
-      {/* 09 UI GUIDELINE ------------------------------------------- */}
+      {/* 09 HOW TO USE ------------------------------------------- */}
+      <Chapter id="use" title="놓고, 따라 하고, 재고, 이어 간다" lead="처음 설치부터 다음 날 아침까지, 사용 순서를 네 단계로 정리했습니다.">
+        <HowToUse />
+      </Chapter>
+
+      {/* 10 UI GUIDELINE ------------------------------------------- */}
       <Chapter
         id="guide"
         tone="grey"
@@ -998,10 +1010,14 @@ export default function Showing() {
       </Chapter>
 
       {/* 10 SCREENS ------------------------------------------------- */}
-      <section className="x-screens" id="screens" data-chapter="10  Screens">
+      <Chapter id="spec" title="자주 묻는 질문과 제품 사양" lead="기획서와 화면 설계에서 정한 내용만 적었습니다. 정해지지 않은 항목은 ‘추가 자료 필요’로 표시했습니다.">
+        <SpecFaq />
+      </Chapter>
+
+      <section className="x-screens" id="screens" data-chapter="12  Screens">
         <Reveal className="x-screens__head">
           <p className="x-ch__no">
-            <span>10</span>Screens
+            <span>12</span>Screens
           </p>
           <p className="x-screens__title">Mirror 8 · App 8</p>
           <p className="x-screens__ko">하루의 순서대로. 앱 화면은 실제로 눌러 볼 수 있습니다.</p>

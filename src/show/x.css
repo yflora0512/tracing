@@ -2742,3 +2742,325 @@ html[data-hero='night'] .x-head:not(.is-solid) {
       linear-gradient(0deg, rgba(12, 22, 38, 0.72) 0%, rgba(18, 57, 107, 0.25) 60%, transparent 100%);
   }
 }
+
+/* =========================================================
+   v7 — product-page explanation (ref. Stella Beauté BFS)
+   ========================================================= */
+/* feature slides */
+.fs {
+  width: var(--box);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(32px, 5vw, 96px);
+  align-items: center;
+}
+.fs__count {
+  font: 400 14px var(--en);
+  color: #888;
+}
+.fs__count b {
+  font-weight: 500;
+  color: var(--blue);
+}
+.fs__verb {
+  margin: clamp(18px, 2vw, 28px) 0 0;
+  font-size: clamp(40px, 4.4vw, 72px);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.045em;
+  animation: fs-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes fs-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.fs__sub {
+  margin-top: 22px !important;
+  font-size: clamp(15px, 1.1vw, 18px);
+  line-height: 1.8;
+  color: #333;
+  word-break: keep-all;
+}
+.fs__tags {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.fs__tags li {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue);
+  background: #e4f0fb;
+}
+.fs__core {
+  margin-top: 28px;
+  padding: 16px 0;
+  border-top: 1px solid #141414;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 14px;
+  row-gap: 2px;
+}
+.fs__core span {
+  grid-row: 1 / span 2;
+  font: 500 12px var(--en);
+  color: var(--blue);
+  padding-top: 3px;
+}
+.fs__core b {
+  font: 500 18px var(--en);
+}
+.fs__core em {
+  font-style: normal;
+  font-size: 14px;
+  color: #555;
+}
+.fs__more {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 500 14px var(--en);
+}
+.fs__more i {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-style: normal;
+  color: #fff;
+  background: #141414;
+}
+.fs__detail {
+  margin-top: 14px !important;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #444;
+  word-break: keep-all;
+}
+.fs__screen {
+  position: relative;
+  aspect-ratio: 2390 / 1356;
+  border-radius: clamp(10px, 1.2vw, 18px);
+  overflow: hidden;
+  background: #eef2f6;
+  box-shadow: 0 30px 80px -34px rgba(25, 40, 60, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+.fs__screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 0.6s, transform 0.8s;
+}
+.fs__screen img.is-on {
+  opacity: 1;
+  transform: none;
+}
+.fs__nav {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.fs__nav > button:first-child,
+.fs__nav > button:last-child {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #141414;
+  font-size: 15px;
+}
+.fs__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #cfd5dc;
+  transition: width 0.3s, background 0.3s;
+}
+.fs__dot.is-on {
+  width: 28px;
+  background: var(--blue);
+}
+
+/* how to use */
+.how {
+  width: var(--box);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 32px);
+}
+.how__img {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #e8eef5;
+}
+.how__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.how__img .ai-tag {
+  font-size: 9.5px;
+}
+.how__n {
+  display: block;
+  margin-top: 22px;
+  font: 500 13px var(--en);
+  color: var(--blue);
+}
+.how__v {
+  margin: 8px 0 10px;
+  font-size: clamp(20px, 1.6vw, 26px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.how__d {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+  word-break: keep-all;
+}
+
+/* spec & faq */
+.spec {
+  width: var(--box);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 5vw, 96px);
+  align-items: start;
+}
+.spec__h {
+  margin: 0 0 18px;
+  font: 500 clamp(20px, 1.6vw, 26px) var(--en);
+}
+.spec__table {
+  margin: 0;
+  border-top: 1px solid #141414;
+}
+.spec__table div {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 2fr;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.spec__table dt {
+  font-size: 14px;
+  color: #777;
+}
+.spec__table dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+.spec__table dd.is-need {
+  color: var(--blue);
+}
+.faq {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #141414;
+}
+.faq li {
+  border-bottom: 1px solid var(--line);
+}
+.faq button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px 1fr 24px;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 0;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+}
+.faq button span {
+  font: 500 15px var(--en);
+  color: var(--blue);
+}
+.faq button i {
+  font-style: normal;
+  font-size: 18px;
+  color: #888;
+}
+.faq p {
+  margin: 0 0 20px 36px !important;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+  word-break: keep-all;
+}
+
+/* skin challenge */
+.skin__challenge {
+  margin-bottom: 12px !important;
+  font: 500 13px var(--en);
+  color: #141414;
+}
+.skin__result {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+}
+.skin__result li {
+  font-size: 14px;
+  color: #444;
+}
+.skin__result b {
+  display: inline-block;
+  min-width: 56px;
+  font: 500 15px var(--en);
+  color: var(--blue);
+}
+
+@media (max-width: 1024px) {
+  .fs,
+  .spec {
+    grid-template-columns: 1fr;
+  }
+  .fs__visual {
+    order: -1;
+  }
+  .how {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 48px;
+  }
+}
+@media (max-width: 720px) {
+  .how {
+    grid-template-columns: 1fr;
+  }
+  .spec__table div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fs__verb { animation: none; }
+  .fs__screen img { transition: none; }
+}

@@ -95,3 +95,11 @@ UNIX는 브랜드 아이덴티티 프로젝트라 화면 조작이 없지만, Tr
   - hero.jpg 표지 · product.jpg 제품 · morning.jpg 아침 장면 커버 · night.jpg 저녁 장면 커버 · phone.jpg 모바일 · skin.jpg 피부 변화 Day 1/7/14
 - 피부 변화(Skin Change) 블록 신설: 사진 3장 + 14일 수분 그래프(32 → 45 → 58), 슬라이더/사진 TAP. 수치는 콘셉트 — 실측 데이터 필요
 - Behance Kurved: 자동 접근 차단(403)으로 미확인 — 캡처 받으면 반영
+
+## 8. 5차 수정 — 제품 설명 레이어 (ref. Stella Beauté BFS)
+
+- Product: 제품 사진 위 번호 콜아웃 4개(Display Mirror · Light Frame · Neck · Base). 조명·높이 사양은 추가 자료 필요
+- Key Features 도입: 동사형 기능 슬라이드 01/04(맞추다 · 따라 하다 · 재다 · 이어 가다) + 효과 태그 + [Core] 기술 + View More
+- Skin Change: [14 Days Challenge] 결과 3줄(+26, 3→1단계, 평균 57 돌파) — 콘셉트 수치
+- 09 How to Use: [01]~[04] 사진 스텝
+- 11 Spec & FAQ: 정해진 항목만 스펙 표로, 미정(크기·무게·센서 방식·전원)은 ‘추가 자료 필요’. FAQ 5개

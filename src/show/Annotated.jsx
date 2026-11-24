@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { asset } from './parts.jsx';
+import { AiTag } from './Photo.jsx';
 
 /**
  * Screen anatomy: numbered pins on a real screen. Hover or click a pin (or a list item) to highlight its area.
  * pin = { l, t, w, h, k: keyword, title, d: description }  (percentages of the screenshot)
  */
-export default function Annotated({ src, alt, label, pins, ratio = '2390 / 1356' }) {
+export default function Annotated({ src, alt, label, pins, ratio = '2390 / 1356', aiTag = false }) {
   const [on, setOn] = useState(0);
   const p = pins[on];
   return (
@@ -14,6 +15,7 @@ export default function Annotated({ src, alt, label, pins, ratio = '2390 / 1356'
         <img src={asset(src)} alt={alt} loading="lazy" decoding="async" />
         <span className="ann__shade" aria-hidden="true" style={{ '--l': `${p.l}%`, '--t': `${p.t}%`, '--w': `${p.w}%`, '--h': `${p.h}%` }} />
         <span className="ann__box" aria-hidden="true" style={{ left: `${p.l}%`, top: `${p.t}%`, width: `${p.w}%`, height: `${p.h}%` }} />
+        {aiTag && <AiTag dark />}
         {pins.map((x, k) => (
           <button
             key={x.k}

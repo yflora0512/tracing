@@ -485,23 +485,29 @@ const HERO_SHOTS = [
   { img: 'scan-result.png', x: '30%', y: '52%', cap: '21:52 — 겹친 원으로 읽는 오늘의 피부' },
 ];
 
+/** Cover: one glowing light frame (the mirror's edge) on white. A point of blue light traces around it. */
 function HeroCover() {
+  useEffect(() => {
+    document.documentElement.dataset.hero = 'light';
+    return () => delete document.documentElement.dataset.hero;
+  }, []);
   return (
-    <section className="x-kv x-kv--photo" aria-label="Trac:ing 키 비주얼">
-      <img className="x-kv__img" src={asset('photo/hero.jpg')} alt="아침 햇살 속 화장대에서 탁상 미러를 보는 사용자" fetchpriority="high" />
-      <div className="x-kv__veil" aria-hidden="true" />
-      <div className="x-kv__in">
-        <p className="x-kv__kicker">Trac:ing — Desk Beauty Mirror &amp; App</p>
-        <h1 className="x-kv__title">
-          The Mirror That
-          <br />
-          Remembers Your Day
-        </h1>
-        <p className="x-kv__ko">하루를 이어서 기억하는 거울</p>
+    <section className="x-glow" aria-label="Trac:ing 표지">
+      <div className="x-glow__frame">
+        <svg className="x-glow__trace" viewBox="0 0 1440 817" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="2" y="2" width="1436" height="813" rx="64" pathLength="1" className="x-glow__line" />
+          <rect x="2" y="2" width="1436" height="813" rx="64" pathLength="1" className="x-glow__spark" />
+        </svg>
+        <div className="x-glow__in">
+          <h1 className="x-glow__mark">
+            Trac<span>:</span>ing
+          </h1>
+          <p className="x-glow__tag">하루를 이어서 기억하는 거울</p>
+        </div>
       </div>
-      <p className="x-kv__foot">
-        <span>Interaction Design 2026 · 22565053 조윤정 · 김승언 교수님</span>
-        <AiTag />
+      <p className="x-glow__foot">
+        <span>Desk Beauty Mirror &amp; App</span>
+        <span>Interaction Design 2026 · 조윤정</span>
       </p>
     </section>
   );
@@ -610,6 +616,10 @@ export default function Showing() {
         </Reveal>
       </Chapter>
 
+      <Reveal className="x-keyphoto">
+        <img src={asset('photo/hero.jpg')} alt="아침 햇살 속 화장대에서 탁상 미러를 보는 사용자" loading="lazy" decoding="async" />
+        <AiTag />
+      </Reveal>
       <Sub label="Product · 책상 위에 두는, 1m 거리의 거울">탁상형 디스플레이 미러입니다. 번호를 눌러 부위별 역할을 확인해 보세요.</Sub>
       <section className="x-band x-band--plain">
         <Annotated src="photo/product.jpg" alt="탁상형 뷰티 미러 제품 이미지 (AI 콘셉트)" label="제품 구성" pins={PRODUCT_PINS} ratio="1600 / 1200" aiTag />

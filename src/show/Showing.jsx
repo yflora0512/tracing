@@ -485,30 +485,75 @@ const HERO_SHOTS = [
   { img: 'scan-result.png', x: '30%', y: '52%', cap: '21:52 — 겹친 원으로 읽는 오늘의 피부' },
 ];
 
-/** Cover: one glowing light frame (the mirror's edge) on white. A point of blue light traces around it. */
+/**
+ * Cover v9 (ref. Re'lilla): a soft, blue-washed full-bleed photo of one day, a small mirror “window” in the centre
+ * showing that moment's screen, one line of copy bottom-left, numbered dots, “Scroll for Discover”.
+ */
+const COVER = [
+  { n: 1, photo: "photo/hero.jpg", pos: "62% 40%", screen: "home.png", time: "08:10 Morning", alt: "아침 홈 화면" },
+  { n: 2, photo: "photo/night.jpg", pos: "50% 35%", screen: "scan-result.png", time: "21:52 Night", alt: "저녁 스캔 결과 화면" },
+  { n: 3, photo: "photo/morning.jpg", pos: "50% 40%", screen: "change.png", time: "Day 14 Tomorrow", alt: "피부 변화 화면" },
+];
+
 function HeroCover() {
+  const [i, setI] = useState(0);
+  const [hold, setHold] = useState(false);
   useEffect(() => {
-    document.documentElement.dataset.hero = 'light';
+    document.documentElement.dataset.hero = "night";
     return () => delete document.documentElement.dataset.hero;
   }, []);
+  useEffect(() => {
+    if (hold || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const t = setInterval(() => setI((k) => (k + 1) % COVER.length), 5200);
+    return () => clearInterval(t);
+  }, [hold]);
   return (
-    <section className="x-glow" aria-label="Trac:ing 표지">
-      <div className="x-glow__frame">
-        <svg className="x-glow__trace" viewBox="0 0 1440 817" preserveAspectRatio="none" aria-hidden="true">
-          <rect x="2" y="2" width="1436" height="813" rx="64" pathLength="1" className="x-glow__line" />
-          <rect x="2" y="2" width="1436" height="813" rx="64" pathLength="1" className="x-glow__spark" />
+    <section className="x-rl" aria-label="Trac:ing 표지">
+      <div className="x-rl__bg" aria-hidden="true">
+        {COVER.map((c, k) => (
+          <img key={c.photo} src={asset(c.photo)} alt="" className={k === i ? "is-on" : ""} style={{ objectPosition: c.pos }} decoding="async" />
+        ))}
+      </div>
+      <div className="x-rl__win">
+        {COVER.map((c, k) => (
+          <img key={c.screen} src={asset(c.screen)} alt={k === i ? c.alt : ""} className={k === i ? "is-on" : ""} decoding="async" />
+        ))}
+        <svg className="x-rl__trace" viewBox="0 0 1440 817" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="2" y="2" width="1436" height="813" rx="40" pathLength="1" />
         </svg>
-        <div className="x-glow__in">
-          <h1 className="x-glow__mark">
-            Trac<span>:</span>ing
-          </h1>
-          <p className="x-glow__tag">하루를 이어서 기억하는 거울</p>
+      </div>
+      <div className="x-rl__copy">
+        <h1 className="x-rl__h">
+          You are what you trace,
+          <br />
+          day and night.
+        </h1>
+        <p className="x-rl__ko">하루를 이어서 기억하는 거울, Trac:ing</p>
+        <div className="x-rl__dots">
+          {COVER.map((c, k) => (
+            <button
+              key={c.n}
+              type="button"
+              className={k === i ? "is-on" : ""}
+              aria-label={`${c.n}. ${c.time}`}
+              aria-pressed={k === i}
+              onClick={() => {
+                setI(k);
+                setHold(true);
+              }}
+            >
+              {c.n}
+            </button>
+          ))}
+          <span className="x-rl__time" aria-live="polite">{COVER[i].time}</span>
         </div>
       </div>
-      <p className="x-glow__foot">
+      <p className="x-rl__side">
         <span>Desk Beauty Mirror &amp; App</span>
         <span>Interaction Design 2026 · 조윤정</span>
       </p>
+      <a className="x-rl__scroll" href="#overview">Scroll for Discover</a>
+      <span className="x-rl__ai">AI concept image · 실촬영 교체 필요</span>
     </section>
   );
 }
